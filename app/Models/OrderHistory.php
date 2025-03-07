@@ -30,4 +30,19 @@ class OrderHistory extends Model
             'created_at' => $this->created_at ? Carbon::parse($this->created_at)->translatedFormat('d M Y') : null,
         ];
     }
+
+        // ความสัมพันธ์กับ ReceiveProduct
+        public function receiveProduct() {
+            return $this->belongsTo(ReceiveProduct::class, 'order_id', 'id'); // เปลี่ยน 'order_id' และ 'id' ตามที่เหมาะสม
+        }
+    
+        // ความสัมพันธ์กับ SupplierInformation
+        public function supplier() {
+            return $this->belongsTo(SupplierInformation::class, 'supplier_id', 'id'); // ถ้ามี supplier_id ใน order history
+        }
+    
+        // ความสัมพันธ์กับ EmployeeInformation
+        public function employee() {
+            return $this->belongsTo(EmployeeInformation::class, 'employee_id', 'id'); // ถ้ามี employee_id ใน order history
+        }
 }

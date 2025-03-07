@@ -28,55 +28,66 @@
                                 <div class="space-y-6">
                                     <div class="p-4 bg-white dark:bg-gray-800 shadow sm:rounded-lg flex items-center gap-4">
                                         <div>
-                                            <x-input-label for="company_name" :value="__('ชื่อบริษัท')" />
-                                            <x-text-input wire:model="company_name" id="company_name"
-                                                name="company_name" value="{{ $supplier->company_name }}" type="text" class="mt-1 block w-full"
-                                                required autofocus autocomplete="company_name" placeholder="ชื่อบริษัท"/>
-                                            @error('company_name')
+                                            <x-input-label for="id" :value="__('เลขที่บริษัท')" />
+                                            <x-text-input wire:model="id" id="id"
+                                                name="id" value="{{ $supplier->id }}" type="text" class="mt-1 block w-full"
+                                                required autofocus autocomplete="id" placeholder="เลขที่บริษัท"/>
+                                            @error('id')
                                                 <div class="aleart alert-success">{{ $message }}</div>
                                             @enderror
                                         </div>
                                     </div>
                                     <div class="p-4 bg-white dark:bg-gray-800 shadow sm:rounded-lg flex items-center gap-4">
                                         <div>
-                                            <x-input-label for="customer_name" :value="__('ชื่อลูกค้า')" />
-                                            <x-text-input wire:model="customer_name" id="customer_name"
-                                                name="customer_name" value="{{ $supplier->customer_name }}" type="text" class="mt-1 block w-full"
-                                                required autofocus autocomplete="customer_name" placeholder="ชื่อลูกค้า"/>
-                                            @error('customer_name')
+                                            <x-input-label for="supplier_name" :value="__('ชื่อบริษัท')" />
+                                            <x-text-input wire:model="supplier_name" id="supplier_name"
+                                                name="supplier_name" value="{{ $supplier->supplier_name }}" type="text" class="mt-1 block w-full"
+                                                required autofocus autocomplete="supplier_name" placeholder="ชื่อบริษัท"/>
+                                            @error('supplier_name')
                                                 <div class="aleart alert-success">{{ $message }}</div>
                                             @enderror
                                         </div>
                                     </div>
                                     <div class="p-4 bg-white dark:bg-gray-800 shadow sm:rounded-lg flex items-center gap-4">
                                         <div>
-                                            <x-input-label for="about_product" :value="__('จำหน่ายสินค้า')" />
-                                            <x-text-input wire:model="about_product" id="about_product"
-                                                name="about_product" value="{{ $supplier->about_product }}" type="text" class="mt-1 block w-full"
-                                                required autofocus autocomplete="about_product" placeholder="จำหน่ายสินค้า"/>
-                                            @error('about_product')
+                                            <x-input-label for="supplier_customer_name" :value="__('ชื่อผู้ติดต่อ')" />
+                                            <x-text-input wire:model="supplier_customer_name" id="supplier_customer_name"
+                                                name="supplier_customer_name" value="{{ $supplier->supplier_customer_name }}" type="text" class="mt-1 block w-full"
+                                                required autofocus autocomplete="supplier_customer_name" placeholder="ชื่อผู้ติดต่อ"/>
+                                            @error('supplier_customer_name')
                                                 <div class="aleart alert-success">{{ $message }}</div>
                                             @enderror
                                         </div>
                                     </div>
                                     <div class="p-4 bg-white dark:bg-gray-800 shadow sm:rounded-lg flex items-center gap-4">
                                         <div>
-                                            <x-input-label for="contact_number" :value="__('เบอร์ติดต่อ')" />
-                                            <x-text-input wire:model="contact_number" id="contact_number"
-                                                name="contact_number" value="{{ $supplier->contact_number }}" type="text" class="mt-1 block w-full"
-                                                required autofocus autocomplete="contact_number" placeholder="เบอร์ติดต่อ"/>
-                                            @error('contact_number')
+                                            <x-input-label for="supplier_product" :value="__('จำหน่ายสินค้า')" />
+                                            <x-text-input wire:model="supplier_product" id="supplier_product"
+                                                name="supplier_product" value="{{ $supplier->supplier_product }}" type="text" class="mt-1 block w-full"
+                                                required autofocus autocomplete="supplier_product" placeholder="จำหน่ายสินค้า"/>
+                                            @error('supplier_product')
                                                 <div class="aleart alert-success">{{ $message }}</div>
                                             @enderror
                                         </div>
                                     </div>
                                     <div class="p-4 bg-white dark:bg-gray-800 shadow sm:rounded-lg flex items-center gap-4">
                                         <div>
-                                            <x-input-label for="email" :value="__('อีเมลล์')" />
-                                            <x-text-input wire:model="email" id="email"
-                                                name="email" value="{{ $supplier->email }}" type="email" class="mt-1 block w-full"
-                                                required autofocus autocomplete="email" placeholder="อีเมลล์"/>
-                                            @error('email')
+                                            <x-input-label for="supplier_contact_number" :value="__('เบอร์ติดต่อ')" />
+                                            <x-text-input wire:model="supplier_contact_number" id="supplier_contact_number"
+                                                name="supplier_contact_number" value="{{ $supplier->supplier_contact_number }}" type="text" class="mt-1 block w-full"
+                                                required autofocus autocomplete="supplier_contact_number" placeholder="เบอร์ติดต่อ"/>
+                                            @error('supplier_contact_number')
+                                                <div class="aleart alert-success">{{ $message }}</div>
+                                            @enderror
+                                        </div>
+                                    </div>
+                                    <div class="p-4 bg-white dark:bg-gray-800 shadow sm:rounded-lg flex items-center gap-4">
+                                        <div>
+                                            <x-input-label for="supplier_email" :value="__('อีเมลล์')" />
+                                            <x-text-input wire:model="supplier_email" id="supplier_email"
+                                                name="supplier_email" value="{{ $supplier->supplier_email }}" type="email" class="mt-1 block w-full"
+                                                required autofocus autocomplete="supplier_email" placeholder="อีเมลล์"/>
+                                            @error('supplier_email')
                                                 <div class="aleart alert-success">{{ $message }}</div>
                                             @enderror
                                         </div>

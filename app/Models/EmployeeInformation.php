@@ -10,24 +10,47 @@ class EmployeeInformation extends Model
 {
     use HasFactory;
     use Searchable;
+
     protected $table = 'employee_information';
     protected $primaryKey = 'id';
-    protected $fillable = ['employee_id', 
-        'firstname', 
-        'lastname', 
-        'contact_number', 
-        'email', 'status', 
-        'image' => 'default_value',
+    protected $fillable = [
+        'employee_firstname', 
+        'employee_lastname', 
+        'employee_contact_number', 
+        'employee_email', 
+        'employee_status'
         ];
 
     public function toSearchableArray()
     {
         return [
-            'employee_id' => $this->employee_id,
-            'firstname' => $this->firstname,
-            'lastname' => $this->lastname,
-            'contact_number' => $this->contact_number,
-            'status' => $this->status,
+            'id' => $this->id,
+            'employee_firstname' => $this->employee_firstname,
+            'employee_lastname' => $this->employee_lastname,
+            'employee_contact_number' => $this->employee_contact_number,
+            'employee_email' => $this->employee_email,
+            'employee_status' => $this->employee_status,
         ];
+    }
+
+    public function orders()
+    {
+        return $this->hasMany(Ordernow::class, 'employee_id');
+    }
+
+    public function productsalereport() {
+        return $this->hasMany(ProductSaleReport::class, 'employee_id');
+    }
+
+    public function inventoryreport() {
+        return $this->hasMany(InventoryReport::class, 'employee_id');
+    }
+
+    public function admininventoryreport() {
+        return $this->hasMany(AdminInventoryReport::class, 'employee_id');
+    }
+
+    public function dailysale() {
+        return $this->hasMany(DailySale::class, 'employee_id');
     }
 }

@@ -31,10 +31,20 @@ class Zone extends Model
         return $this->belongsTo(Product::class);
     }
 
+    // เพิ่มความสัมพันธ์กับ EoqropCalculation
+    public function eoqropCalculations() {
+        return $this->hasMany(EoqropCalculation::class, 'zone_id');
+    }
+
     public function toSearchableArray()
     {
         return [
             'id' => $this->id,
+            'name' => $this->name,
+            'product_id' => $this->product_id,
+            'warehouse_id' => $this->warehouse_id,
+            'zone_status' => $this->zone_status,
         ];
     }
+    
 }

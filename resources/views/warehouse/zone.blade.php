@@ -2,7 +2,7 @@
 <x-appadmin-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            {{ __('รายละเอียด') }}
+            {{ __('ข้อมูลพื้นที่คลังสินค้า') }}
         </h2>
     </x-slot>
 
@@ -12,10 +12,12 @@
                 <div class="p-6 text-gray-900 dark:text-gray-100">
                     <div class="container mt-2">
                         <div class="space-y-6">
-                            <div class="flex items-center gap-4">
-                                <p class="bread"><span><a href="{{ route('warehouse.warehouses') }}"
-                                            class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-800 hover:text-gray-700 dark:hover:text-gray-300 focus:outline-none transition ease-in-out duration-150">ย้อนกลับ</a></span>
-                                    / <span>รายละเอียด</span></p>
+                            <div class="flex justify-between">
+                                <a href="{{ route('warehouse.create') }}"><x-primary-button>เพิ่มข้อมูล</x-primary-button></a>
+                                <form method="GET" action="{{ route('warehouse.index') }}">
+                                    <input type="text" name="search" id="search" class="shadow appearance-none border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" placeholder="ค้นหา" value="{{ request('search') }}">
+                                    <x-primary-button type="submit">ค้นหา</x-primary-button>
+                                </form>
                             </div>
                             <hr class="my-4 border-gray-300 dark:border-gray-700">
                             <!-- Display warehouse details -->
@@ -42,9 +44,21 @@
                                     <strong>พื้นที่ทั้งหมด:</strong> 
                                     <span style="margin-left: 5px;">{{ $warehouse->warehouse_total_area }} ตารางเมตร</span>
                                 </p>
-                                <p class="flex items-center">
+                                <p class="flex items-center" style="margin-right: 20px;">
                                     <strong>พื้นที่จัดเก็บที่ใช้ได้:</strong>
                                     <span style="margin-left: 5px;">{{ $warehouse->warehouse_available_area }} ตารางเมตร</span>
+                                </p>
+                                <p class="flex items-center" style="margin-right: 20px;">
+                                    <strong>พื้นที่จัดเก็บที่ใช้แล้ว:</strong>
+                                    <span style="margin-left: 5px; color: {{ $totalUsedArea > 0 ? 'red' : 'green' }};">
+                                        {{ $totalUsedArea }} ตารางเมตร
+                                    </span>
+                                </p>
+                                <p class="flex items-center">
+                                    <strong>พื้นที่จัดเก็บที่เหลือ:</strong>
+                                    <span style="margin-left: 5px; color: {{ $availableArea > 0 ? 'green' : 'red' }};">
+                                        {{ $availableArea }} ตารางเมตร
+                                    </span>
                                 </p>
                             </div>
                             <div class="flex flex-wrap mb-4 space-x-4">
@@ -76,7 +90,7 @@
                             <h3 class="text-xl mb-4"><strong>พื้นที่จัดเก็บสินค้า</strong></h3>
                             <div class="flex justify-between">
                                 <a href="{{ route('warehouse.createzone', ['id' => $warehouse->id]) }}" class=""><x-primary-button>เพิ่มข้อมูล</x-primary-button></a>
-                                <form method="GET" action="{{ route('warehouse.index') }}">
+                                <form method="GET" action="{{ route('warehouse.zone', ['id' => $warehouse->id]) }}">
                                     <input type="text" name="search" id="search" class="shadow appearance-none border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" placeholder="ค้นหา" value="{{ request('search') }}">
                                     <x-primary-button type="submit">ค้นหา</x-primary-button>
                                 </form>
@@ -86,7 +100,7 @@
                                 <p>{{ $message }}</p>
                             </div>
                             @endif
-                            <table id="productunittable" width="100%" border="1" cellpadding="5" cellspacing="0">
+                            <table width="100%" border="1" cellpadding="5" cellspacing="0">
                                 <tbody>
                                     <tr>
                                         <td width="10%" align="left" valign="middle"><strong>รหัสโซน</strong></td>
@@ -96,8 +110,7 @@
                                         <td width="15%" align="left" valign="middle"><strong>ขนาด</strong></td>
                                         <td width="10%" align="left" valign="middle"><strong>ปริมาตรพื้นที่</strong></td>
                                         <td width="10%" align="left" valign="middle"><strong>สถานะ</strong></td>
-                                        <td width="10%" align="center" valign="middle"><strong>แก้ไข</strong></td>
-                                        <td width="10%" align="center" valign="middle"><strong>ลบ</strong></td>
+                                        <td colspan="2" width="10%" align="center" valign="middle"><strong>Action</strong></td>
                                     </tr>
                             
                                     @foreach ($warehouse->zones as $zone)
@@ -138,9 +151,6 @@
 
     <script src="https://cdn.datatables.net/2.0.5/js/dataTables.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-    <script>
-        let table = new DataTable('#productunittable');
-    </script>
 
     <script>
         $('.delete-button').click(function(event){
@@ -174,5 +184,13 @@
             }
         });
     </script>
+
+    @if($availableArea < 0)
+    <script>
+        window.onload = function() {
+            alert('พื้นที่ที่ใช้งานทั้งหมดเกินกว่าพื้นที่ที่มีในคลังสินค้า กรุณาตรวจสอบข้อมูลอีกครั้ง');
+        }
+    </script>
+    @endif
 
 </x-appadmin-layout>

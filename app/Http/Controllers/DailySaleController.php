@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\DailySale;
+use App\Models\EmployeeInformation;
 use Carbon\Carbon;
 
 class DailySaleController extends Controller
@@ -27,47 +28,86 @@ class DailySaleController extends Controller
 
     // Create resource
     public function create() {
-        return view('dailysale.create');
+        $currentDate = now()->format('Y-m-d'); // วันที่ปัจจุบันในรูปแบบ YYYY-MM-DD
+        $employees = EmployeeInformation::all(); // ดึงข้อมูลพนักงานทั้งหมดจากตาราง
+        return view('dailysale.create', [
+            'currentDate' => $currentDate,
+            'employees' => $employees,
+        ]);
+    }
+
+    public function getEmployeeDetails($id)
+    {
+        // ดึงข้อมูลจากตาราง employee_information
+        $employee = EmployeeInformation::find($id);
+    
+        if (!$employee) {
+            return response()->json(['message' => 'Employee not found'], 404);
+        }
+    
+        return response()->json([
+            'employee' => [
+                'id' => $employee->id,
+                'firstname' => $employee->employee_firstname,
+                'lastname' => $employee->employee_lastname,
+                'contact_number' => $employee->employee_contact_number,
+                'email' => $employee->employee_email,
+                'status' => $employee->employee_status,
+            ],
+        ]);
     }
 
     //Store resource
     public function store(Request $request) {
         $request->validate([
             'total_earning' => 'required',
-            'Scan_to_pay' => 'required',
+            'scan_to_pay' => 'required',
             'cash' => 'required',
             'sale_date' => 'required',
-            'reporter_name' => 'required',
+            'employee_id' => 'required|numeric',
         ]);
 
         $dailysale = new DailySale;
         $dailysale->total_earning = $request->total_earning;
-        $dailysale->Scan_to_pay = $request->Scan_to_pay;
+        $dailysale->scan_to_pay = $request->scan_to_pay;
         $dailysale->cash = $request->cash;
         $dailysale->sale_date = $request->sale_date;
-        $dailysale->reporter_name = $request->reporter_name;
+        $dailysale->employee_id = $request->input('employee_id');
         $dailysale->save();
         return redirect()->route('dailysale.dailysales')->with('success', 'รายงานยอดขายเรียบร้อยแล้ว');
     }
 
-    public function edit(DailySale $dailysale) {
-        return view('dailysale.edit', compact('dailysale'));
+    public function edit($id) {
+
+        $dailysale = DailySale::findOrFail($id);
+
+        // ดึงข้อมูลพนักงานทั้งหมด
+        $employees = EmployeeInformation::all();
+        
+        // ส่งข้อมูลไปยังวิว
+        return view('dailysale.edit', [
+            'dailysale' => $dailysale,
+            'currentDate' => $dailysale->sale_date,
+            'employees' => $employees,
+            'selectedEmployeeId' => $dailysale->employee_id,
+            'id' => $id // ส่ง $id ไปยังวิว
+        ]);
     }
 
     public function update(Request $request, $id) {
         $request->validate([
             'total_earning' => 'required',
-            'Scan_to_pay' => 'required',
+            'scan_to_pay' => 'required',
             'cash' => 'required',
             'sale_date' => 'required',
-            'reporter_name' => 'required',
+            'employee_id' => 'required|numeric',
         ]);
-        $dailysale = DailySale::find($id);
+        $dailysale = DailySale::findOrFail($id);
         $dailysale->total_earning = $request->total_earning;
-        $dailysale->Scan_to_pay = $request->Scan_to_pay;
+        $dailysale->scan_to_pay = $request->scan_to_pay;
         $dailysale->cash = $request->cash;
         $dailysale->sale_date = $request->sale_date;
-        $dailysale->reporter_name = $request->reporter_name;
+        $dailysale->employee_id = $request->input('employee_id');
         $dailysale->save();
         return redirect()->route('dailysale.dailysales')->with('success', 'แก้ไขรายงานยอดขายเรียบร้อยแล้ว');
     }
@@ -92,22 +132,37 @@ class DailySaleController extends Controller
         return view('dailysale.admindailysales', ['admindailysales' => $admindailysales]);
     }
 
-    public function adminedit(DailySale $admindailysale) {
-        return view('dailysale.adminedit', compact('admindailysale'));
+    public function adminedit($id) {
+
+        $admindailysale = DailySale::findOrFail($id);
+
+        // ดึงข้อมูลพนักงานทั้งหมด
+        $employees = EmployeeInformation::all();
+        
+        // ส่งข้อมูลไปยังวิว
+        return view('dailysale.adminedit', [
+            'admindailysale' => $admindailysale,
+            'currentDate' => $admindailysale->sale_date,
+            'employees' => $employees,
+            'selectedEmployeeId' => $admindailysale->employee_id,
+            'id' => $id // ส่ง $id ไปยังวิว
+        ]);
     }
 
     public function adminupdate(Request $request, $id) {
         $request->validate([
             'total_earning' => 'required',
-            'Scan_to_pay' => 'required',
+            'scan_to_pay' => 'required',
             'cash' => 'required',
             'sale_date' => 'required',
+            'employee_id' => 'required|numeric',
         ]);
-        $admindailysale = DailySale::find($id);
+        $admindailysale = DailySale::findOrFail($id);
         $admindailysale->total_earning = $request->total_earning;
-        $admindailysale->Scan_to_pay = $request->Scan_to_pay;
+        $admindailysale->scan_to_pay = $request->scan_to_pay;
         $admindailysale->cash = $request->cash;
         $admindailysale->sale_date = $request->sale_date;
+        $admindailysale->employee_id = $request->input('employee_id');
         $admindailysale->save();
         return redirect()->route('dailysale.admindailysales')->with('success', 'แก้ไขรายงานยอดขายเรียบร้อยแล้ว');
     }

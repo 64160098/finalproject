@@ -6,100 +6,142 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\ProductSalesHistory;
 use App\Models\ProductSaleReport;
+use App\Models\Product;
+use App\Models\EmployeeInformation;
+use Carbon\Carbon;
 
 class ProductSalesHistoryController extends Controller
 {
 
-    public function productsalehistorys() {
+    public function index() {
         // ตรวจสอบว่ามีคำค้นหาหรือไม่
         $searchTerm = request('search');
-    
+
         if ($searchTerm) {
             // ใช้ Scout ในการค้นหา
-            $productsalehistorys = ProductSalesHistory::search($searchTerm)->paginate(5);
+            $productsalehistorys = ProductSaleReport::where('employee_id', 'like', "%{$searchTerm}%")
+                ->orWhere('transaction_date', 'like', "%{$searchTerm}%")
+                ->orWhere('total_sales', 'like', "%{$searchTerm}%")
+                ->orWhereHas('employee', function ($query) use ($searchTerm) {
+                    $query->where('employee_firstname', 'like', "%{$searchTerm}%");
+                })
+                ->orWhereHas('employee', function ($query) use ($searchTerm) {
+                    $query->where('employee_lastname', 'like', "%{$searchTerm}%"); 
+                })
+                ->paginate(5);
         } else {
             // ถ้าไม่มีคำค้นหา ให้ดึงข้อมูลทั้งหมดแบบปกติ
-            $productsalehistorys = ProductSalesHistory::orderBy('id', 'asc')->paginate(5);
-        }
-
-        return view('productsalereport.productsalehistorys', ['productsalehistorys' => $productsalehistorys]);
-    }
-
-    public function store(Request $request)
-    {
-        // ตรวจสอบว่ามีสินค้าที่ถูกเลือกไว้หรือไม่
-        if($request->has('selected_products')) {
-            // ดึงข้อมูลสินค้าที่เลือกมาจากฟอร์ม
-            $selectedProducts = $request->get('selected_products');
-    
-        // วนลูปเพื่อบันทึกข้อมูลสินค้าที่เลือกแต่ละตัว
-        foreach ($selectedProducts as $productId) {
-            // ดึงข้อมูลสินค้าจากฐานข้อมูล
-            $productsalereport = ProductSaleReport::find($productId);
-                
-            if ($productsalereport) {
-                // ตรวจสอบว่ามีรายงานสินค้าตัวเดิมในวันเดียวกันหรือไม่
-                $existingReport = ProductSalesHistory::where('code', $productsalereport->code)
-                    ->whereDate('created_at', now()->toDateString())
-                    ->first();
-                
-                if ($existingReport) {
-                    // ถ้ามีรายงานสินค้าตัวเดิมในวันเดียวกัน ให้บวกค่าเพิ่ม
-                    $existingReport->quantity_products_sale += $productsalereport->quantity_products_sale;
-                    $existingReport->total = (float)$existingReport->total + (float)$productsalereport->total;
-                    $existingReport->save();
-                } else {
-                    // ถ้าไม่มีรายงานสินค้าตัวเดิมในวันเดียวกัน ให้สร้างใหม่
-                    ProductSalesHistory::create([
-                        'code' => $productsalereport->code,
-                        'product_name' => $productsalereport->product_name,
-                        'quantity_products_sale' => $productsalereport->quantity_products_sale,
-                        'unit' => $productsalereport->unit,
-                        'cost_unit' => $productsalereport->cost_unit,
-                        'total' => $productsalereport->total,
-                        'created_at' => now()->toDateString(), // ใช้ toDateString เพื่อให้แน่ใจว่าเป็นรูปแบบ date
-                    ]);
-                }
-            }
+            $productsalehistorys = ProductSaleReport::with('employee') // eager load employee
+            ->orderBy('id', 'asc')
+            ->paginate(5);
         }
     
-            // ส่งกลับไปยังหน้าเดิมพร้อมกับข้อความ success ในรูปแบบ JSON
-            return response()->json(['success' => true, 'message' => 'ส่งรายงานการขายสินค้าเรียบร้อยแล้ว']);
-        } else {
-            // หากไม่มีสินค้าที่ถูกเลือก
-            return response()->json(['success' => false, 'message' => 'กรุณาเลือกสินค้าอย่างน้อย 1 รายการ']);
-        }
+        return view('productsalereport.productsalehistorys', [
+            'productsalehistorys' => $productsalehistorys
+        ]);
     }    
-     
-    
-    public function edit(ProductSalesHistory $productsalehistory) {
-        return view('productsalereport.adminedit', compact('productsalehistory'));
+
+    public function edit($id) {
+
+        $productsalereport = ProductSaleReport::findOrFail($id);
+
+        // ดึงข้อมูลพนักงานทั้งหมด
+        $employees = EmployeeInformation::all();
+
+        // ดึงข้อมูลผลิตภัณฑ์ทั้งหมด
+        $products = Product::all();
+
+        // ดึงข้อมูลสินค้าที่เลือกในคำสั่งซื้อ
+        $selectedProducts = json_decode($productsalereport->products_sales, true);
+        
+        // ส่งข้อมูลไปยังวิว
+        return view('productsalereport.adminedit', [
+            'productsalereport' => $productsalereport,
+            'currentDate' => $productsalereport->transaction_date,
+            'employees' => $employees,
+            'products' => $products,
+            'selectedEmployeeId' => $productsalereport->employee_id,
+            'selectedProducts' => $selectedProducts, // ข้อมูลสินค้าที่เลือก
+            'id' => $id // ส่ง $id ไปยังวิว
+        ]);
     }
 
     public function update(Request $request, $id) {
+        // Validate and store the data
         $request->validate([
-            'quantity_products_sale' => 'required',
+            'transaction_date' => 'required|date',
+            'employee_id' => 'required|numeric',
+            'selected_products' => 'required|json', // ตรวจสอบว่า selected_products เป็น JSON
         ]);
-    
-        $productsalehistory = ProductSalesHistory::find($id);
-        if ($productsalehistory) {
-            // อัปเดตจำนวนสินค้าใน inventory report
-            $productsalehistory->quantity_products_sale = $request->quantity_products_sale;
-            
-            // คำนวณค่า total โดยคูณจำนวนสินค้ากับราคาต่อหน่วย
-            $productsalehistory->total = $productsalehistory->quantity_products_sale * $productsalehistory->cost_unit;
-            
-            // บันทึกการเปลี่ยนแปลง
-            $productsalehistory->save();
-            return redirect()->route('inventoryreport.admininventoryreports')->with('success', 'แก้ไขข้อมูลเรียบร้อยแล้ว');
-        } else {
-            return redirect()->back()->with('error', 'ไม่พบข้อมูลที่ต้องการแก้ไข');
-        }
-    }       
 
-    public function destroy(ProductSalesHistory $productsalehistory) {
-        $productsalehistory->delete();
-        return response()->json(['success' => 'ลบข้อมูลเรียบร้อยแล้ว'], 200);
-    }
+        $productsalereport = ProductSaleReport::findOrFail($id);
+
+        // คำนวณราคารวม
+        $selectedProducts = json_decode($request->input('selected_products'), true);
+        $totalPrice = 0;
+        foreach ($selectedProducts as $product) {
+            // ค้นหาราคาแต่ละสินค้าจากฐานข้อมูลหรือที่ใดก็ตาม
+            $productId = $product['id'];
+            $quantity = $product['quantity'];
+    
+            // สมมติว่ามี Model Product หรือวิธีการดึงข้อมูลราคาสินค้า
+            $productData = Product::find($productId);
+            if ($productData) {
+                $price = $productData->price;
+                $totalPrice += $price * $quantity;
+            }
+        }
+    
+        // อัปเดตข้อมูลรายการสินค้า
+        $productsalereport->transaction_date = $request->input('transaction_date');
+        $productsalereport->employee_id = $request->input('employee_id');
+        $productsalereport->products_sales = $request->input('selected_products'); // อัปเดตข้อมูลสินค้าที่เลือกในรูปแบบ JSON
+        $productsalereport->total_sales = $totalPrice;
+        $productsalereport->save();
+    
+        // ส่งกลับไปยังหน้าที่เหมาะสมหลังจากการบันทึกข้อมูลเรียบร้อยแล้ว
+        return redirect()->route('productsalereport.productsalehistorys')->with('success', 'แก้ไขรายงานการขายสินค้าเรียบร้อยแล้ว');
+    }         
+
+    public function showadminProductSaleDetails($productsalereportId) {
+        // ดึงข้อมูลรายงานการขายสินค้าโดยใช้ ID
+        $productsalereport = ProductSaleReport::find($productsalereportId);
+    
+        // ตรวจสอบว่ามีข้อมูลหรือไม่
+        if (!$productsalereport) {
+            return redirect()->route('productsalereport.productsalereports')->with('error', 'Report not found.');
+        }
+    
+        // ดึงข้อมูลพนักงาน
+        $employee = EmployeeInformation::find($productsalereport->employee_id);
+    
+        // ตรวจสอบว่ามีข้อมูลพนักงานหรือไม่
+        if (!$employee) {
+            return redirect()->route('productsalereport.productsalereports')->with('error', 'Employee not found.');
+        }
+    
+        // Decode ข้อมูลสินค้าในรูปแบบ JSON
+        $orderedProducts = json_decode($productsalereport->products_sales, true);
+    
+        // สร้างอาร์เรย์เพื่อเก็บรายละเอียดสินค้า
+        $productDetails = [];
+    
+        foreach ($orderedProducts as $product) {
+            $productDetail = Product::find($product['id']);
+            if ($productDetail) {
+                $productDetail->quantity = $product['quantity']; // เพิ่มข้อมูลจำนวนสินค้า
+                $productDetails[] = $productDetail;
+            } else {
+                // กรณีไม่พบข้อมูลสินค้า
+                $productDetails[] = (object)[
+                    'product_name' => 'ไม่พบข้อมูลสินค้า',
+                    'quantity' => $product['quantity']
+                ];
+            }
+        }
+    
+        // ส่งข้อมูลไปยัง view
+        return view('productsalereport.detailproductsaleadmin', compact('productsalereport', 'employee', 'productDetails'));
+    }   
 
 }

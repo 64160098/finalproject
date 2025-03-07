@@ -160,6 +160,7 @@
                                         @error('status')
                                             <div class="aleart alert-success">{{ $message }}</div>
                                         @enderror
+                                        <p class="text-sm text-red-600">*สถานะที่กรอกมีดังนี้ Active, Inactive, Under Maintenance</p>
                                     </div>
 
                                 <div class="items-center gap-4">

@@ -11,10 +11,6 @@ class AdminInventoryReport extends Model
 {
     use HasFactory;
     use Searchable;
-
-    protected $fillable = [
-        'code', 'product_name', 'quantity_inventories', 'unit', 'cost_unit', 'total', 'created_at'
-    ];
     
     public function toSearchableArray()
     {
@@ -23,5 +19,10 @@ class AdminInventoryReport extends Model
             'product_name' => $this->product_name,
             'created_at' => $this->created_at ? Carbon::parse($this->created_at)->translatedFormat('d M Y') : null,
         ];
+    }
+
+    public function employee()
+    {
+        return $this->belongsTo(EmployeeInformation::class, 'employee_id');
     }
 }

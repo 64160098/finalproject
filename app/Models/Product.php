@@ -31,34 +31,41 @@ class Product extends Model
     }
 
     public function inventory() {
-        return $this->belongsTo(Inventory::class);
+        return $this->hasMany(Inventory::class, 'product_id', 'id');
     }
 
     public function productsalereport() {
         return $this->belongsTo(ProductSaleReport::class);
     }
 
+    public function productsalehistory() {
+        return $this->belongsTo(ProductSalesHistory::class);
+    }
+
     public function zones() {
         return $this->hasMany(Zone::class);
     }
 
-    // ความสัมพันธ์กับ ProductType
+    public function warehouse() {
+        return $this->belongsTo(Warehouse::class);
+    }
+
     public function productType() {
         return $this->belongsTo(ProductType::class, 'product_type_id');
     }
-
-    // ความสัมพันธ์กับ ProductUnit
+    
     public function productUnit() {
         return $this->belongsTo(ProductUnit::class, 'product_unit_id');
     }
 
-    public function toSearchableArray()
-    {
+    public function toSearchableArray() {
         return [
             'id' => $this->id,
             'product_name' => $this->product_name,
-            'product_type' => $this->product_type,
-            'unit' => $this->unit,
         ];
+    }      
+
+    public function eoqropCalculations() {
+        return $this->hasMany(EoqropCalculation::class, 'product_id', 'id');
     }
 }

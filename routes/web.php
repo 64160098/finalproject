@@ -10,7 +10,6 @@ use App\Http\Controllers\ReceiveProductController;
 use App\Http\Controllers\OrderHistoryController;
 use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\DailySaleController;
-use App\Http\Controllers\OrderProductController;
 use App\Http\Controllers\OrderListController;
 use App\Http\Controllers\InventoryReportController;
 use App\Http\Controllers\ProductSalesHistoryController;
@@ -22,6 +21,9 @@ use App\Http\Controllers\SuperadminController;
 use App\Http\Controllers\WarehouseController;
 use App\Http\Controllers\ZoneController;
 use App\Http\Controllers\EoqropCalculationController;
+use App\Http\Controllers\OrdernowController;
+use App\Http\Controllers\PdfController;
+use App\Http\Controllers\loginnController;
 
 Route::redirect('/', '/login');
 
@@ -115,6 +117,10 @@ Route::get('product/detailrop', [ProductController::class, 'seemorerop'])
     ->middleware(['auth', 'verified', 'admin'])
     ->name('product.detailrop');
 
+Route::delete('product/{product}', [ProductController::class, 'destroy'])
+    ->middleware(['auth', 'verified', 'admin'])
+    ->name('product.destroy');
+
 // Route สำหรับแสดงหน้า createeoq
 Route::middleware(['auth', 'verified', 'admin'])->group(function () {
     // แสดงหน้า create EOQ
@@ -133,6 +139,19 @@ Route::get('product/{product}', [ProductController::class, 'edit'])
 Route::post('eoqrop/store', [EoqropCalculationController::class, 'store'])
     ->middleware(['auth', 'verified', 'admin'])
     ->name('eoqrop.store');
+
+Route::get('product/{id}/editeoq', [EoqropCalculationController::class, 'edit'])
+    ->middleware(['auth', 'verified', 'admin'])
+    ->name('eoqrop.edit');
+
+Route::post('product/{id}/editeoq', [EoqropCalculationController::class, 'update'])
+    ->middleware(['auth', 'verified', 'admin'])
+    ->name('product.editeoq.update');
+
+Route::delete('eoqrop/{eoqrop}', [EoqropCalculationController::class, 'destroy'])
+    ->middleware(['auth', 'verified', 'admin'])
+    ->name('product.destroyeoq');
+
 
 Route::resource('product', ProductController::class);
 
@@ -182,10 +201,6 @@ Route::get('receiveproduct/receiveproducts', [ReceiveProductController::class, '
     ->middleware(['auth', 'verified', 'admin'])
     ->name('receiveproduct.receiveproducts');
 
-Route::get('receiveproduct/{create}', [ReceiveProductController::class, 'showReceiveForm'])
-    ->middleware(['auth', 'verified', 'admin'])
-    ->name('receiveproduct.create');
-
 Route::get('receiveproduct/{receiveproduct}/edit', [ReceiveProductController::class, 'edit'])
     ->middleware(['auth', 'verified', 'admin'])
     ->name('receiveproduct.edit');
@@ -193,10 +208,6 @@ Route::get('receiveproduct/{receiveproduct}/edit', [ReceiveProductController::cl
 Route::post('receiveproduct/{receiveproduct}', [ReceiveProductController::class, 'update'])
     ->middleware(['auth', 'verified', 'admin'])
     ->name('receiveproduct.update');
-
-Route::delete('receiveproduct/{receiveproduct}', [ReceiveProductController::class, 'destroy'])
-    ->middleware(['auth', 'verified', 'admin'])
-    ->name('receiveproduct.destroy');
 
 Route::post('receiveproduct/{receiveproduct}', [ReceiveProductController::class, 'store'])
     ->middleware(['auth', 'verified', 'admin'])
@@ -218,23 +229,28 @@ Route::get('orderhistory/orderhistorys', [OrderHistoryController::class, 'index'
     ->middleware(['auth', 'verified', 'admin'])
     ->name('orderhistory.orderhistorys');
 
-Route::post('orderhistory/{orderhistorys}', [OrderHistoryController::class, 'store'])
+Route::get('orderhistory/{order_id}', [OrderHistoryController::class, 'detailorderhistory'])
     ->middleware(['auth', 'verified', 'admin'])
-    ->name('orderhistory.store');
+    ->name('orderhistory.detailorderhistory');
 
-Route::get('orderhistory/{orderhistory}/edit', [OrderHistoryController::class, 'edit'])
+Route::get('orderhistory/{order_id}/edit', [OrderHistoryController::class, 'edit'])
     ->middleware(['auth', 'verified', 'admin'])
     ->name('orderhistory.edit');
 
-Route::post('orderhistory/{orderhistory}', [OrderHistoryController::class, 'update'])
+Route::post('orderhistory/{order_id}', [OrderHistoryController::class, 'update'])
     ->middleware(['auth', 'verified', 'admin'])
     ->name('orderhistory.update');
+
+
+Route::delete('orderhistory/{orderhistory}', [OrderHistoryController::class, 'destroy'])
+    ->middleware(['auth', 'verified', 'admin'])
+    ->name('orderhistory.destroy');
 
 Route::resource('orderhistory', OrderHistoryController::class);
 
 //Route Inventory
 
-Route::get('inventory/inventories', [InventoryController::class, 'showInventoryForm'])
+Route::get('inventory/inventories', [InventoryController::class, 'index'])
     ->middleware(['auth', 'verified', 'admin'])
     ->name('inventory.inventories');
 
@@ -258,13 +274,16 @@ Route::get('dailysale/dailysales', [DailySaleController::class, 'index'])
     ->middleware(['auth', 'verified', 'normal'])
     ->name('dailysale.dailysales');
 
-Route::get('dailysale/{dailysale}/edit', [DailySaleController::class, 'edit'])
-    ->middleware(['auth', 'verified', 'normal'])
-    ->name('dailysale.edit');
+Route::get('/employee-details-dailysale/{id}', [DailySaleController::class, 'getEmployeeDetails'])
+    ->name('inventoryreport.getDetailsemployee');
 
-Route::post('dailysale/{dailysale}', [DailySaleController::class, 'update'])
+Route::get('dailysale/edit/{id}', [DailySaleController::class, 'edit'])
     ->middleware(['auth', 'verified', 'normal'])
-    ->name('dailysale.update');
+    ->name('dailysale.user.edit');
+
+Route::post('dailysale/edit/{id}', [DailySaleController::class, 'update'])
+    ->middleware(['auth', 'verified', 'normal'])
+    ->name('dailysale.user.update');
 
 Route::delete('dailysale/{dailysale}', [DailySaleController::class, 'destroy'])
     ->middleware(['auth', 'verified', 'normal'])
@@ -278,13 +297,13 @@ Route::get('dailysale/admindailysales', [DailySaleController::class, 'admindaily
     ->middleware(['auth', 'verified', 'admin'])
     ->name('dailysale.admindailysales');
 
-Route::post('admindailysale/{admindailysale}', [DailySaleController::class, 'adminupdate'])
+Route::post('dailysale/adminedit/{id}', [DailySaleController::class, 'adminupdate'])
     ->middleware(['auth', 'verified', 'admin'])
-    ->name('dailysale.adminupdate');
+    ->name('dailysale.admin.update');
 
-Route::get('admindailysale/{admindailysale}/edit', [DailySaleController::class, 'adminedit'])
+Route::get('dailysale/adminedit/{id}', [DailySaleController::class, 'adminedit'])
     ->middleware(['auth', 'verified', 'admin'])
-    ->name('dailysale.adminedit');
+    ->name('dailysale.admin.edit');
 
 Route::get('dailysale/adminmonthlysales', [DailySaleController::class, 'adminmonthlysales'])
     ->middleware(['auth', 'verified', 'admin'])
@@ -296,59 +315,11 @@ Route::get('dailysale/adminmonthlysales', [DailySaleController::class, 'getMonth
 
 Route::resource('dailysale', DailySaleController::class);
 
-//Route OrderProduct
-
-Route::get('orderproduct/orderproducts', [OrderProductController::class, 'index'])
-    ->middleware(['auth', 'verified', 'normal'])
-    ->name('orderproduct.orderproducts');
-
-Route::get('orderproduct/{create}', [OrderProductController::class, 'showOrderForm'])
-    ->middleware(['auth', 'verified', 'normal'])
-    ->name('orderproduct.create');
-
-Route::get('orderproduct/{orderproduct}/edit', [OrderProductController::class, 'edit'])
-    ->middleware(['auth', 'verified', 'normal'])
-    ->name('orderproduct.edit');
-
-Route::post('orderproduct/{orderproduct}', [OrderProductController::class, 'update'])
-    ->middleware(['auth', 'verified', 'normal'])
-    ->name('orderproduct.update');
-
-Route::delete('orderproduct/{orderproduct}', [OrderProductController::class, 'destroy'])
-    ->middleware(['auth', 'verified', 'normal'])
-    ->name('orderproduct.destroy');
-
-Route::post('orderproduct/{orderproduct}', [OrderProductController::class, 'store'])
-    ->middleware(['auth', 'verified', 'normal'])
-    ->name('orderproduct.store');
-
-Route::get('orderproduct/confirmorders', [OrderProductController::class, 'confirm'])
-    ->middleware(['auth', 'verified', 'normal'])
-    ->name('orderproduct.confirmorders');
-
-Route::delete('orderproduct', [OrderProductController::class, 'deleteAll'])
-    ->middleware(['auth', 'verified', 'normal'])
-    ->name('orderproduct.deleteAll');
-
-Route::resource('orderproduct', OrderProductController::class);
-
 //Route OrderList
 
 Route::get('orderlist/orderlists', [OrderListController::class, 'index'])
     ->middleware(['auth', 'verified', 'admin'])
     ->name('orderlist.orderlists');
-
-Route::post('orderlist/{orderlists}', [OrderListController::class, 'store'])
-    ->middleware(['auth', 'verified', 'admin'])
-    ->name('orderlist.store');
-
-Route::get('orderlist/{orderlist}/edit', [OrderListController::class, 'edit'])
-    ->middleware(['auth', 'verified', 'admin'])
-    ->name('orderlist.edit');
-
-Route::post('orderlist/{orderlist}', [OrderListController::class, 'update'])
-    ->middleware(['auth', 'verified', 'admin'])
-    ->name('orderlist.update');
 
 Route::resource('orderlist', OrderListController::class);
 
@@ -358,57 +329,56 @@ Route::get('inventoryreport/inventoryreports', [InventoryReportController::class
     ->middleware(['auth', 'verified', 'normal'])
     ->name('inventoryreport.inventoryreports');
 
-Route::get('inventoryreport/{create}', [InventoryReportController::class, 'showReportForm'])
+Route::get('inventoryreport/{create}', [InventoryReportController::class, 'create'])
     ->middleware(['auth', 'verified', 'normal'])
     ->name('inventoryreport.create');
 
-Route::get('inventoryreport/{inventoryreport}/edit', [InventoryReportController::class, 'edit'])
-    ->middleware(['auth', 'verified', 'normal'])
-    ->name('inventoryreport.edit');
+Route::get('/employee-details-inventoryreport/{id}', [InventoryReportController::class, 'getEmployeeDetails'])
+    ->name('inventoryreport.getDetailsemployee');
 
-Route::post('inventoryreport/{inventoryreport}', [InventoryReportController::class, 'update'])
+Route::post('inventoryreport/inventoryreport', [InventoryReportController::class, 'store'])
     ->middleware(['auth', 'verified', 'normal'])
-    ->name('inventoryreport.update');
+    ->name('inventoryreport.store');
+
+Route::get('inventoryreport/edit/{id}', [InventoryReportController::class, 'edit'])
+    ->middleware(['auth', 'verified', 'normal'])
+    ->name('inventoryreport.user.edit');
+
+Route::post('inventoryreport/edit/{id}', [InventoryReportController::class, 'update'])
+    ->middleware(['auth', 'verified', 'normal'])
+    ->name('inventoryreport.user.update');
 
 Route::delete('inventoryreport/{inventoryreport}', [InventoryReportController::class, 'destroy'])
     ->middleware(['auth', 'verified', 'normal'])
     ->name('inventoryreport.destroy');
 
-Route::post('inventoryreport/{inventoryreport}', [InventoryReportController::class, 'store'])
+Route::get('inventoryreport/detailinventoryreport/{id}', [InventoryReportController::class, 'showInventoryReportDetails'])
     ->middleware(['auth', 'verified', 'normal'])
-    ->name('inventoryreport.store');
-
-Route::get('inventoryreport/confirmorders', [InventoryReportController::class, 'confirm'])
-    ->middleware(['auth', 'verified', 'normal'])
-    ->name('inventoryreport.confirmorders');
-
-Route::delete('inventoryreport', [InventoryReportController::class, 'deleteAll'])
-    ->middleware(['auth', 'verified', 'normal'])
-    ->name('inventoryreport.deleteAll');
+    ->name('inventoryreport.detailinventoryreport');
 
 Route::resource('inventoryreport', InventoryReportController::class);
 
 //Route AdminInventoryReport
 
-Route::get('admininventoryreport/admininventoryreports', [AdminInventoryReportController::class, 'admininventoryreports'])
+Route::get('admininventoryreport/admininventoryreports', [AdminInventoryReportController::class, 'index'])
     ->middleware(['auth', 'verified', 'admin'])
     ->name('inventoryreport.admininventoryreports');
 
-Route::get('admininventoryreport/{admininventoryreport}/edit', [AdminInventoryReportController::class, 'edit'])
+Route::get('inventoryreport/adminedit/{id}', [AdminInventoryReportController::class, 'edit'])
     ->middleware(['auth', 'verified', 'admin'])
-    ->name('inventoryreport.adminedit');
+    ->name('inventoryreport.admin.edit');
 
-Route::post('admininventoryreport/{admininventoryreport}', [AdminInventoryReportController::class, 'update'])
+Route::post('inventoryreport/adminedit/{id}', [AdminInventoryReportController::class, 'update'])
     ->middleware(['auth', 'verified', 'admin'])
-    ->name('inventoryreport.adminupdate');
-
-Route::post('admininventoryreport/admininventoryreport', [AdminInventoryReportController::class, 'store'])
-    ->middleware(['auth', 'verified', 'admin'])
-    ->name('admininventoryreport.store');
+    ->name('inventoryreport.admin.update');
 
 Route::delete('admininventoryreport/{admininventoryreport}', [AdminInventoryReportController::class, 'destroy'])
     ->middleware(['auth', 'verified', 'admin'])
     ->name('admininventoryreport.destroy');
+
+Route::get('inventoryreport/admindetailinventoryreport/{id}', [AdminInventoryReportController::class, 'AdminshowInventoryReportDetails'])
+    ->middleware(['auth', 'verified', 'admin'])
+    ->name('inventoryreport.admindetailinventoryreport');
 
 Route::resource('admininventoryreport', AdminInventoryReportController::class);
 
@@ -418,58 +388,59 @@ Route::get('productsalereport/productsalereports', [ProductSaleReportController:
     ->middleware(['auth', 'verified', 'normal'])
     ->name('productsalereport.productsalereports');
 
-Route::get('productsalereport/{create}', [ProductSaleReportController::class, 'showProductForm'])
+Route::get('productsalereport/create', [ProductSaleReportController::class, 'create'])
     ->middleware(['auth', 'verified', 'normal'])
     ->name('productsalereport.create');
 
-Route::get('productsalereport/{productsalereport}/edit', [ProductSaleReportController::class, 'edit'])
+Route::get('/employee-details-productsalereport/{id}', [ProductSaleReportController::class, 'getEmployeeDetails'])
+    ->name('productsalereport.getDetailsemployee');
+
+Route::post('productsalereport/productsalereport', [ProductSaleReportController::class, 'store'])
+    ->middleware(['auth', 'verified', 'normal'])
+    ->name('productsalereport.store');
+
+Route::get('productsalereport/edit/{id}', [ProductSaleReportController::class, 'edit'])
     ->middleware(['auth', 'verified', 'normal'])
     ->name('productsalereport.edit');
 
-Route::post('productsalereport/{productsalereport}', [ProductSaleReportController::class, 'update'])
+Route::post('productsalereport/edit/{id}', [ProductSaleReportController::class, 'update'])
     ->middleware(['auth', 'verified', 'normal'])
-    ->name('productsalereport.update');
+    ->name('productsalereport.user.update');
 
 Route::delete('productsalereport/{productsalereport}', [ProductSaleReportController::class, 'destroy'])
     ->middleware(['auth', 'verified', 'normal'])
     ->name('productsalereport.destroy');
 
-Route::post('productsalereport/{productsalereport}', [ProductSaleReportController::class, 'store'])
+Route::get('productsalereport/detailproductsale/{id}', [ProductSaleReportController::class, 'showProductSaleDetails'])
     ->middleware(['auth', 'verified', 'normal'])
-    ->name('productsalereport.store');
+    ->name('productsalereport.detailproductsale');
 
-Route::get('productsalereport/confirmorders', [ProductSaleReportController::class, 'confirm'])
-    ->middleware(['auth', 'verified', 'normal'])
-    ->name('productsalereport.confirmorders');
-
-Route::delete('productsalereport', [ProductSaleReportController::class, 'deleteAll'])
-    ->middleware(['auth', 'verified', 'normal'])
-    ->name('productsalereport.deleteAll');
+Route::get('productsalereport/monthlyproductsales', [ProductSaleReportController::class, 'show'])
+    ->middleware(['auth', 'verified', 'admin'])
+    ->name('productsalereport.monthlyproductsales');
 
 Route::resource('productsalereport', ProductSaleReportController::class);
 
 
 //Route ProductSalesHistory
 
-Route::get('productsalehistory/productsalehistorys', [ProductSalesHistoryController::class, 'productsalehistorys'])
+Route::get('productsalehistory/productsalehistorys', [ProductSalesHistoryController::class, 'index'])
     ->middleware(['auth', 'verified', 'admin'])
     ->name('productsalereport.productsalehistorys');
 
-Route::post('productsalehistory/productsalehistory', [ProductSalesHistoryController::class, 'store'])
+Route::get('productsalereport/detailproductsaleadmin/{id}', [ProductSalesHistoryController::class, 'showadminProductSaleDetails'])
     ->middleware(['auth', 'verified', 'admin'])
-    ->name('productsalehistory.store');
+    ->name('productsalereport.admin.detailproductsaleadmin');
 
-Route::get('productsalehistory/{productsalehistory}/edit', [ProductSalesHistoryController::class, 'edit'])
+Route::get('productsalereport/adminedit/{id}', [ProductSalesHistoryController::class, 'edit'])
     ->middleware(['auth', 'verified', 'admin'])
-    ->name('productsalehistory.edit');
+    ->name('productsalereport.adminedit');
 
-Route::post('productsalehistory/{productsalehistory}', [ProductSalesHistoryController::class, 'update'])
+Route::post('productsalereport/{productsalereport}', [ProductSalesHistoryController::class, 'update'])
     ->middleware(['auth', 'verified', 'admin'])
-    ->name('productsalehistory.update');
+    ->name('productsalereport.history.update');
 
-Route::delete('productsalehistory/{productsalehistory}', [ProductSalesHistoryController::class, 'destroy'])
-    ->middleware(['auth', 'verified', 'admin'])
-    ->name('productsalehistory.destroy');
+
 
 Route::resource('productsalehistory', ProductSalesHistoryController::class);
 
@@ -559,5 +530,81 @@ Route::delete('warehouse/{warehouse}/zone/{zone}', [ZoneController::class, 'dest
 Route::get('/zone-product-details/{id}', [ZoneController::class, 'getProductDetailsByZone'])
     ->name('zone.productDetails');
 
+Route::get('generate-pdf/{id}', [EoqropCalculationController::class, 'generatePDF'])
+    ->middleware(['auth', 'verified', 'admin'])
+    ->name('product.eoqropdetail');
+
+Route::get('product/detailmore/{productId}', [EoqropCalculationController::class, 'showDetails'])
+    ->middleware(['auth', 'verified', 'admin'])
+    ->name('product.detailmore');
+
+Route::get('/product-and-warehouses/{productId}', [EoqropCalculationController::class, 'getProductAndWarehouses'])
+    ->middleware(['auth', 'verified', 'admin']);
+
+Route::get('/warehouse-zones/{warehouseId}/{productId}', [EoqropCalculationController::class, 'getZonesByWarehouse'])
+    ->middleware(['auth', 'verified', 'admin']);
+
+Route::get('/zone-details/{zoneId}', [EoqropCalculationController::class, 'getZoneDetails'])
+    ->middleware(['auth', 'verified', 'admin']);
+
+//Route Ordernow
+
+Route::get('ordernow/ordernows', [OrdernowController::class, 'index'])
+    ->middleware(['auth', 'verified', 'admin'])
+    ->name('ordernow.ordernows');
+
+Route::get('ordernow/createstep1', [OrdernowController::class, 'createstep1'])
+    ->middleware(['auth', 'verified', 'admin'])
+    ->name('ordernow.createstep1');
+
+Route::post('ordernow/createstep1', [OrdernowController::class, 'postStep1'])
+    ->middleware(['auth', 'verified', 'admin'])
+    ->name('ordernow.postStep1');
+    
+Route::get('ordernow/createstep2', [OrdernowController::class, 'createstep2'])
+    ->middleware(['auth', 'verified', 'admin'])
+    ->name('ordernow.createstep2');
+
+Route::post('ordernow/createstep2', [OrdernowController::class, 'postStep2'])
+    ->middleware(['auth', 'verified', 'admin'])
+    ->name('ordernow.postStep2');
+
+// ขั้นตอนที่ 1
+Route::get('ordernow/editstep1/{id}', [OrdernowController::class, 'editStep1'])
+    ->middleware(['auth', 'verified', 'admin'])
+    ->name('ordernow.editstep1');
+
+Route::post('ordernow/editstep1/{id}', [OrdernowController::class, 'updateStep1'])
+    ->middleware(['auth', 'verified', 'admin'])
+    ->name('ordernow.updateStep1');
+
+// ขั้นตอนที่ 2
+Route::get('ordernow/editstep2/{id}', [OrdernowController::class, 'editStep2'])
+    ->middleware(['auth', 'verified', 'admin'])
+    ->name('ordernow.editstep2');
+
+Route::post('ordernow/editstep2/{id}', [OrdernowController::class, 'updateStep2'])
+    ->middleware(['auth', 'verified', 'admin'])
+    ->name('ordernow.updateStep2');
+
+Route::delete('ordernow/{ordernow}', [OrdernowController::class, 'destroy'])
+    ->middleware(['auth', 'verified', 'admin'])
+    ->name('ordernow.destroy');
+
+Route::get('/supplier-details/{id}', [OrdernowController::class, 'getSupplierDetails'])
+    ->name('ordernow.getDetailssupplier');
+
+Route::get('/employee-details/{id}', [OrdernowController::class, 'getEmployeeDetails'])
+    ->name('ordernow.getDetailsemployee');
+
+Route::get('ordernow/detailorder/{id}', [OrdernowController::class, 'showOrderDetails'])
+    ->middleware(['auth', 'verified', 'admin'])
+    ->name('ordernow.detailorder');
+
+Route::get('ordernow/{id}/detailorder', [OrdernowController::class, 'generateorderPDF'])
+    ->middleware(['auth', 'verified', 'admin'])
+    ->name('ordernow.generateorderPDF');
+    
+Route::resource('ordernow', OrdernowController::class);
 
 require __DIR__.'/auth.php';

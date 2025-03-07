@@ -8,30 +8,46 @@ use Illuminate\Support\Facades\DB;
 use App\Models\ProductType;
 use App\Models\ProductUnit;
 use App\Models\Warehouse;
+use App\Models\EoqropCalculation;
 use App\Models\Zone;
+use App\Models\Inventory;
 
 class ProductController extends Controller
 {
+
     public function index()
     {
-        // ตรวจสอบว่ามีคำค้นหาหรือไม่
         $searchTerm = request('search');
     
         if ($searchTerm) {
-            // ใช้ Scout ในการค้นหา
-            $products = Product::search($searchTerm)
-                ->with('productType', 'productUnit') // โหลดข้อมูลที่เกี่ยวข้อง
+            // ค้นหาด้วย Scout และโหลดความสัมพันธ์ที่เกี่ยวข้อง
+            $products = Product::where('product_name', 'like', "%{$searchTerm}%")
+                ->orWhere('product_width', 'like', "%{$searchTerm}%")
+                ->orWhere('product_length', 'like', "%{$searchTerm}%")
+                ->orWhere('product_height', 'like', "%{$searchTerm}%")
+                ->orWhere('product_volume', 'like', "%{$searchTerm}%")
+                ->orWhere('price', 'like', "%{$searchTerm}%")
+                ->orWhere('id', 'like', "%{$searchTerm}%")
+                ->orWhereHas('productType', function ($query) use ($searchTerm) {
+                    $query->where('product_type', 'like', "%{$searchTerm}%"); // ค้นหาจาก product_type
+                })
+                ->orWhereHas('productUnit', function ($query) use ($searchTerm) {
+                    $query->where('unit', 'like', "%{$searchTerm}%"); // ค้นหาจาก unit
+                })
                 ->paginate(5);
+    
+            // โหลดความสัมพันธ์หลังจากค้นหา
+            $products->load('productType', 'productUnit', 'eoqropCalculations');
         } else {
             // ถ้าไม่มีคำค้นหา ให้ดึงข้อมูลทั้งหมดแบบปกติ
             $products = Product::orderBy('id', 'asc')
-                ->with('productType', 'productUnit') // โหลดข้อมูลที่เกี่ยวข้อง
+                ->with('productType', 'productUnit', 'eoqropCalculations') // โหลดข้อมูลที่เกี่ยวข้อง
                 ->paginate(5);
         }
     
         return view('product.products', ['products' => $products]);
     }
-    
+      
 
     public function count()
     {
@@ -53,6 +69,7 @@ class ProductController extends Controller
     }
 
     public function store(Request $request) {
+        // Validate the request
         $request->validate([
             'id' => 'required',
             'product_name' => 'required',
@@ -61,12 +78,13 @@ class ProductController extends Controller
             'product_width' => 'required|numeric',
             'product_length' => 'required|numeric',
             'product_height' => 'required|numeric',
-            'price' => 'required'
+            'price' => 'required',
         ]);
     
         // Calculate volume
         $product_volume = $request->product_width * $request->product_length * $request->product_height;
     
+        // Check if product already exists
         $existingProduct = Product::where('id', $request->id)
             ->orWhere('product_name', $request->product_name)
             ->first();
@@ -83,13 +101,14 @@ class ProductController extends Controller
                 }
                 return back()->withErrors(['product_name' => 'ชื่อสินค้านี้ถูกใช้ไปแล้ว']);
             }
-        }  
+        }
     
+        // Save to products table
         $product = new Product;
         $product->id = $request->id;
         $product->product_name = $request->product_name;
-        $product->product_type_id = $request->product_type_id; // แก้ไขตรงนี้
-        $product->product_unit_id = $request->product_unit_id; // แก้ไขตรงนี้
+        $product->product_type_id = $request->product_type_id;
+        $product->product_unit_id = $request->product_unit_id;
         $product->product_width = $request->product_width;
         $product->product_length = $request->product_length;
         $product->product_height = $request->product_height;
@@ -97,9 +116,14 @@ class ProductController extends Controller
         $product->price = $request->price;
         $product->save();
     
-        return redirect()->route('product.products')->with('success', 'เพิ่มข้อมูลสินค้าเรียบร้อยแล้ว');
-    }
-    
+        // Save to inventories table
+        $inventory = new Inventory;
+        $inventory->product_id = $product->id; // ใช้ id ของ product ที่เพิ่งบันทึก
+        // ไม่ต้องบันทึก amount
+        $inventory->save();
+        
+        return redirect()->route('product.products')->with('success', 'เพิ่มข้อมูลสินค้าและสินค้าคงคลังเรียบร้อยแล้ว');
+    }    
 
     public function edit(Product $product) {
         $producttypes = ProductType::all();
@@ -167,12 +191,21 @@ class ProductController extends Controller
         return response()->json(['success' => 'ข้อมูลสินค้าถูกลบเรียบร้อยแล้ว'], 200);
     }
 
-    public function createEoq()
-    {
-        $products = Product::all(); // ดึงข้อมูลสินค้าทั้งหมดจากฐานข้อมูล
-        $warehouses = Warehouse::all(); // ดึงข้อมูลสินค้าทั้งหมดจากฐานข้อมูล
-        return view('product.createeoq', compact('products', 'warehouses'));
+    public function createEoq() {
+        // สุ่มเลข 8 หลักที่ไม่ซ้ำ
+        do {
+            // สร้างเลขสุ่ม 8 หลัก
+            $id = str_pad(random_int(0, 99999999), 8, '0', STR_PAD_LEFT);
+        } while (EoqropCalculation::where('id', $id)->exists()); // ตรวจสอบว่าเลขนี้มีอยู่แล้วในฐานข้อมูลหรือไม่
+    
+        // ดึงข้อมูลสินค้าทั้งหมดจากฐานข้อมูล
+        $products = Product::all();
+        $warehouses = Warehouse::all();
+    
+        // ส่งข้อมูล $id ที่สุ่มได้ไปยัง view ด้วย
+        return view('product.createeoq', compact('products', 'warehouses', 'id'));
     }
+    
 
     public function getProductDetails($id)
     {
@@ -226,6 +259,6 @@ class ProductController extends Controller
     // Create resource
     public function seemorerop() {
         return view('product.detailrop');
-    }
-
+    } 
+    
 }

@@ -32,7 +32,9 @@
                                             <!-- บรรทัดแรก -->
                                             <div class="w-1/2">
                                                 <x-input-label for="product_id" :value="__('รหัสสินค้า')" />
-                                                <select id="product_id" name="product_id" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50" style="width: 200px;" required>
+                                                <select id="product_id" name="product_id" class="mt-1 block w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 
+                                                focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring focus:ring-indigo-500 
+                                                dark:focus:ring-indigo-600 focus:ring-opacity-50 rounded-md shadow-sm" style="width: 200px;" required>
                                                     <option value="">เลือกรหัสสินค้า</option>
                                                     @foreach($products as $product)
                                                         <option value="{{ $product->id }}">{{ $product->id }}</option>
@@ -109,11 +111,15 @@
                                         <div class="flex flex-wrap gap-4">
                                             <!-- บรรทัดแรก -->
                                             <div class="w-1/2">
-                                                <x-input-label for="warehouse_id" :value="__('รหัสคลังสินค้า')" />
-                                                <x-text-input wire:model="warehouse_id" id="warehouse_id" name="warehouse_id" type="text" class="mt-1 block" style="width: 300px;" required autofocus autocomplete="warehouse_id" placeholder="รหัสคลังสินค้า" readonly/>
-                                                <div class="alert alert-danger" id="warehouse_id_error" style="display:none;"></div>
+                                                <x-input-label for="warehouse_id" :value="__('คลังสินค้า')" />
+                                                <select id="warehouse-select" name="warehouse_id" class="mt-1 block w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 
+                                                focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring focus:ring-indigo-500 
+                                                dark:focus:ring-indigo-600 focus:ring-opacity-50 rounded-md shadow-sm" style="width: 200px;">
+                                                    <option value="">เลือกคลังสินค้า</option>
+                                                </select>
+                                                <div class="alert alert-danger mt-2" id="warehouse_id_error" style="display:none;"></div>
                                                 @error('warehouse_id')
-                                                    <div class="alert alert-success">{{ $message }}</div>
+                                                    <div class="alert alert-danger mt-2">{{ $message }}</div>
                                                 @enderror
                                             </div>
                                             <div class="w-1/2">
@@ -189,13 +195,17 @@
                                         <div class="flex flex-wrap gap-4">
                                             <!-- บรรทัดสาม-->
                                             <div class="w-1/2">
-                                                <x-input-label for="zone_id" :value="__('รหัสโซน')" />
-                                                <x-text-input wire:model="zone_id" id="zone_id" name="zone_id" type="text" class="mt-1 block" style="width: 300px;" required autofocus autocomplete="zone_id" placeholder="รหัสโซน" readonly/>
-                                                <div class="alert alert-danger" id="zone_id_error" style="display:none;"></div>
+                                                <x-input-label for="zone-select" :value="__('พื้นที่จัดเก็บสินค้า')" />
+                                                <select id="zone-select" name="zone_id" class="mt-1 block w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 
+                                                focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring focus:ring-indigo-500 
+                                                dark:focus:ring-indigo-600 focus:ring-opacity-50 rounded-md shadow-sm" style="width: 230px;">
+                                                    <option value="">เลือกพื้นที่จัดเก็บสินค้า</option>
+                                                </select>
+                                                <div class="alert alert-danger mt-2" id="zone_id_error" style="display:none;"></div>
                                                 @error('zone_id')
-                                                    <div class="alert alert-success">{{ $message }}</div>
+                                                    <div class="alert alert-danger mt-2">{{ $message }}</div>
                                                 @enderror
-                                            </div>
+                                            </div>                                            
                                             <div class="w-1/2">
                                                 <x-input-label for="zone_name" :value="__('ชื่อโซน')" />
                                                 <x-text-input id="zone_name" name="zone_name" type="text" class="mt-1 block" style="width: 300px;" placeholder="ชื่อโซน" readonly />
@@ -258,7 +268,7 @@
                                         <hr class="my-4 border-gray-300 dark:border-gray-700">
                                         <div class="w-1/2">
                                             <x-input-label for="id" :value="__('รหัสใบวิเคราะห์ข้อมูล ')" />
-                                            <x-text-input wire:model="id" id="id" name="id" type="text" class="mt-1 block w-full" style="max-width: 300px;" required autofocus autocomplete="id" placeholder="รหัสใบวิเคราะห์ข้อมูล" />
+                                            <x-text-input wire:model="id" id="id" value="{{ $id }}" name="id" type="text" class="mt-1 block w-full" style="max-width: 300px;" required autofocus autocomplete="id" placeholder="รหัสใบวิเคราะห์ข้อมูล" readonly />
                                             <div class="alert alert-danger" id="id_error" style="display:none;"></div>
                                             @error('id')
                                                 <div class="alert alert-success">{{ $message }}</div>
@@ -314,6 +324,14 @@
                                                     <div class="alert alert-success">{{ $message }}</div>
                                                 @enderror
                                             </div>
+                                            <div class="w-1/2">
+                                                <x-input-label for="safety_stock" :value="__('Safety Stock (SS) ')" />
+                                                <x-text-input wire:model="safety_stock" id="safety_stock" name="safety_stock" type="text" class="mt-1 block w-full" required autofocus autocomplete="safety_stock" placeholder="ปริมาณสินค้าสำรอง (หน่วย)" />
+                                                <div class="alert alert-danger" id="safety_stock_error" style="display:none;"></div>
+                                                @error('safety_stock')
+                                                    <div class="alert alert-success">{{ $message }}</div>
+                                                @enderror
+                                            </div>
                                         </div> 
                                         
                                         <a href="{{ route('product.detail') }}" style="display: flex; align-items: center; margin: 0 10px; margin-top: 20px;" title="รายละเอียด">
@@ -341,31 +359,94 @@
     
     <script>
         $(document).ready(function() {
+            // เมื่อเลือกรหัสสินค้า
             $('#product_id').on('change', function() {
-                let id = $(this).val();
-                if (id) {
+                let productId = $(this).val();
+                if (productId) {
                     $.ajax({
-                        url: '/product-details/' + id,
+                        url: '/product-and-warehouses/' + productId,
                         type: 'GET',
                         success: function(response) {
-                            // แสดงข้อมูลสินค้าที่ถูกดึงมาในฟอร์ม
+                            // แสดงข้อมูลสินค้า
                             $('#product_name').val(response.product.name);
                             $('#product_width').val(response.product.width);
                             $('#product_length').val(response.product.length);
                             $('#product_height').val(response.product.height);
                             $('#product_volume').val(response.product.volume);
-    
+
+                            // เคลียร์และแสดงคลังสินค้าใน dropdown
+                            $('#warehouse-select').empty().append('<option value="">เลือกคลังสินค้า</option>');
+                            $.each(response.warehouses, function(index, warehouse) {
+                                $('#warehouse-select').append('<option value="' + warehouse.warehouse_id + '">' + warehouse.name + '</option>');
+                            });
+
+                            // เคลียร์ฟิลด์คลังสินค้าและโซนเมื่อเปลี่ยนสินค้า
+                            $('#warehouse_name, #warehouse_width, #warehouse_length, #warehouse_height, #warehouse_total_area, #warehouse_available_area').val('');
+                            $('#zone-select, #zone_name, #zone_width, #zone_length, #zone_height, #zone_volume').empty().val('');
+                        },
+                        error: function(xhr) {
+                            alert('ไม่พบข้อมูลสินค้าหรือคลังสินค้า');
+                        }
+                    });
+                } else {
+                    // เคลียร์ฟิลด์ทั้งหมดเมื่อไม่มีสินค้าที่ถูกเลือก
+                    $('#product_name, #product_width, #product_length, #product_height, #product_volume').val('');
+                    $('#warehouse-select').empty().append('<option value="">เลือกคลังสินค้า</option>');
+                    $('#warehouse_name, #warehouse_width, #warehouse_length, #warehouse_height, #warehouse_total_area, #warehouse_available_area').val('');
+                    $('#zone-select, #zone_name, #zone_width, #zone_length, #zone_height, #zone_volume').empty().val('');
+                }
+            });
+
+                // เมื่อเลือกคลังสินค้า
+                $('#warehouse-select').on('change', function() {
+                let warehouseId = $(this).val();
+                let productId = $('#product_id').val();  // ใช้ productId ที่เลือกไปก่อนหน้า
+
+                // เคลียร์ข้อมูลโซนทุกครั้งที่เปลี่ยนคลังสินค้าใหม่
+                $('#zone-select').empty().append('<option value="">เลือกรหัสโซน</option>');
+                $('#zone_name, #zone_width, #zone_length, #zone_height, #zone_volume').val('');
+
+                if (warehouseId && productId) {
+                    $.ajax({
+                        url: '/warehouse-zones/' + warehouseId + '/' + productId,
+                        type: 'GET',
+                        success: function(response) {
                             // แสดงข้อมูลคลังสินค้า
-                            $('#warehouse_id').val(response.warehouse.warehouse_id);
-                            $('#warehouse_name').val(response.warehouse.name);
-                            $('#warehouse_total_area').val(response.warehouse.total_area);
-                            $('#warehouse_available_area').val(response.warehouse.available_area);
-                            $('#warehouse_width').val(response.warehouse.width);
-                            $('#warehouse_length').val(response.warehouse.length);
-                            $('#warehouse_height').val(response.warehouse.height);
-    
-                            // แสดงข้อมูลโซนที่สินค้าอยู่
-                            $('#zone_id').val(response.zone.zone_id);
+                            let warehouse = response.warehouses[0];
+                            $('#warehouse_name').val(warehouse.name);
+                            $('#warehouse_width').val(warehouse.width);
+                            $('#warehouse_length').val(warehouse.length);
+                            $('#warehouse_height').val(warehouse.height);
+                            $('#warehouse_total_area').val(warehouse.total_area);
+                            $('#warehouse_available_area').val(warehouse.available_area);
+
+                            // เคลียร์และแสดงโซนใน dropdown
+                            $('#zone-select').empty().append('<option value="">เลือกรหัสโซน</option>');
+                            $.each(response.zones, function(index, zone) {
+                                $('#zone-select').append('<option value="' + zone.zone_id + '">' + zone.name + '</option>');
+                            });
+                        },
+                        error: function(xhr) {
+                            alert('ไม่พบข้อมูลโซน');
+                        }
+                    });
+                } else {
+                    // เคลียร์ข้อมูลคลังสินค้าและโซน
+                    $('#warehouse_name, #warehouse_width, #warehouse_length, #warehouse_height, #warehouse_total_area, #warehouse_available_area').val('');
+                    $('#zone-select').empty().append('<option value="">เลือกรหัสโซน</option>');
+                    $('#zone_name, #zone_width, #zone_length, #zone_height, #zone_volume').val('');
+                }
+            });
+
+            // เมื่อเลือกโซน
+            $('#zone-select').on('change', function() {
+                let zoneId = $(this).val();
+                if (zoneId) {
+                    $.ajax({
+                        url: '/zone-details/' + zoneId,  // URL ที่ใช้ดึงข้อมูลโซน
+                        type: 'GET',
+                        success: function(response) {
+                            // แสดงข้อมูลโซน
                             $('#zone_name').val(response.zone.name);
                             $('#zone_width').val(response.zone.width);
                             $('#zone_length').val(response.zone.length);
@@ -373,14 +454,12 @@
                             $('#zone_volume').val(response.zone.volume);
                         },
                         error: function(xhr) {
-                            // แสดงข้อผิดพลาดที่ชัดเจน
-                            console.error('Error fetching product details:', xhr.responseText);
-                            alert('ไม่พบรายละเอียดของสินค้า');
+                            alert('ไม่พบข้อมูลโซน');
                         }
                     });
                 } else {
-                    // เคลียร์ฟิลด์ทั้งหมดเมื่อไม่มีสินค้าที่ถูกเลือก
-                    $('#product_name, #product_width, #product_length, #product_height, #product_volume, #warehouse_id, #warehouse_name, #warehouse_total_area, #warehouse_width, #warehouse_length, #warehouse_height, #zone_id, #zone_name, #zone_width, #zone_length, #zone_height, #zone_volume').val('');
+                    // เคลียร์ข้อมูลเมื่อไม่มีโซนที่เลือก
+                    $('#zone_name, #zone_width, #zone_length, #zone_height, #zone_volume').val('');
                 }
             });
         });
@@ -390,9 +469,9 @@
         $(document).ready(function(){
             $('#submit-button').click(function(event){
                 event.preventDefault(); // ป้องกันการส่งฟอร์มไปยังเซิร์ฟเวอร์
-    
+        
                 var formData = new FormData($('form')[0]); // สร้าง FormData จากฟอร์ม
-    
+        
                 $.ajax({
                     url: '{{ route('eoqrop.store') }}', // URL ของการส่งข้อมูล
                     type: 'POST',
@@ -402,14 +481,16 @@
                     success: function(response){
                         // กระบวนการเมื่อสำเร็จ
                         console.log(response); // แสดงผลลัพธ์ในคอนโซล
-                        alert('เพิ่มข้อมูลสินค้าเรียบร้อยแล้ว');
-                        // รีเฟรชหน้าหรือทำสิ่งอื่นตามต้องการ
-                        window.location.href = "{{ route('product.products') }}";
+                        alert(response.message); // แสดงข้อความสำเร็จ
+                        window.location.href = "{{ route('product.products') }}"; // รีเฟรชหน้าหรือเปลี่ยนหน้า
                     },
                     error: function(xhr){
                         // กระบวนการเมื่อเกิดข้อผิดพลาด
                         console.error('Error:', xhr);
-                        if (xhr.status === 422) {
+                        if (xhr.status === 400 && xhr.responseJSON && xhr.responseJSON.message) {
+                            // แสดงข้อความแจ้งเตือนหากข้อมูลซ้ำ
+                            alert(xhr.responseJSON.message);
+                        } else if (xhr.status === 422) {
                             var errors = xhr.responseJSON.errors;
                             if (errors.id) {
                                 $('#id_error').show().text(errors.id[0]);
@@ -424,6 +505,7 @@
                 });
             });
         });
-    </script>   
+    </script>
+    
 
 </x-appadmin-layout>

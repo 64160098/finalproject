@@ -12,20 +12,29 @@ class SupplierInformation extends Model
     use Searchable;
 
     protected $fillable = [
-        'company_name',
-        'customer_name',
-        'about_product',
-        'contact_number',
-        'email',
+        'id',
+        'supplier_name',
+        'supplier_customer_name',
+        'supplier_product',
+        'supplier_contact_number',
+        'supplier_email',
     ];
 
     public function toSearchableArray()
     {
         return [
-            'company_name' => $this->company_name,
-            'customer_name' => $this->customer_name,
-            'about_product' => $this->about_product,
-            'contact_number' => $this->contact_number,
+            'id' => $this->id,
+            'supplier_name' => $this->supplier_name,
+            'supplier_customer_name' => $this->supplier_customer_name,
+            'supplier_product' => $this->supplier_product,
+            'supplier_contact_number' => $this->supplier_contact_number,
+            'supplier_email' => $this->supplier_email,
         ];
     }
+
+    public function orders()
+    {
+        return $this->hasMany(Ordernow::class, 'supplier_id');
+    }
+    
 }

@@ -1,7 +1,24 @@
+<style>
+    .scrollable-table-container {
+        max-height: 400px; /* ปรับขนาดความสูงตามต้องการ */
+        overflow-y: auto;
+    }
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    td, th {
+        border: 1px solid #ddd;
+        padding: 8px;
+    }
+    th {
+        background-color: #f2f2f2;
+    }
+</style>
 <x-appnormal-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            {{ __('เลือกรายการสินค้า') }}
+            {{ __('สร้างรายงานสินค้าคงเหลือ') }}
         </h2>
     </x-slot>
 
@@ -14,7 +31,7 @@
                             <div class="flex items-center gap-4">
                                 <p class="bread"><span><a href="{{ route('inventoryreport.inventoryreports') }}"
                                             class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-800 hover:text-gray-700 dark:hover:text-gray-300 focus:outline-none transition ease-in-out duration-150">ย้อนกลับ</a></span>
-                                    / <span>เลือกรายการสินค้า</span></p>
+                                    / <span>สร้างรายงานสินค้าคงเหลือ</span></p>
                             </div>
                             @if (session('status'))
                                 <div class="aleart alert-success">
@@ -22,87 +39,140 @@
                                 </div>
                             @endif
                             <section>
-                                    <table id="producttable" width="100%" border="1" cellpadding="5" cellspacing="0">
+                                <form id="inventoryreportForm" action="{{ route('inventoryreport.store') }}" method="POST" enctype="multipart/form-data">
+                                    @csrf
+                                <div class="space-y-6">
+                                    <div class="w-1/2">
+                                        <x-input-label for="transaction_date" :value="__('วันที่ทำรายการ ')" />
+                                        <x-text-input value="{{ $currentDate }}" id="transaction_date" name="transaction_date" type="date" class="mt-1 block w-full" style="max-width: 300px;" required autofocus autocomplete="transaction_date" placeholder="วันที่สั่งซื้อ" />
+                                        <div class="alert alert-danger" id="transaction_date_error" style="display:none;"></div>
+                                        @error('transaction_date')
+                                            <div class="alert alert-success">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                <hr class="border-gray-300 dark:border-gray-700">
+                                <h1 class="font-bold text-xl mb-4">ข้อมูลผู้รายงาน</h1>
+                                <div class="flex flex-wrap gap-4">
+                                    <!-- บรรทัดแรก -->
+                                    <div class="w-1/2">
+                                        <x-input-label for="employee_id" :value="__('รหัสพนักงาน')" />
+                                        <select id="employee_id" name="employee_id" class="mt-1 block w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 
+                                            focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring focus:ring-indigo-500 
+                                            dark:focus:ring-indigo-600 focus:ring-opacity-50 rounded-md shadow-sm" style="width: 200px;" required>
+                                            <option value="">เลือกรหัสพนักงาน</option>
+                                            @foreach($employees as $employee)
+                                                <option value="{{ $employee->id }}" {{ $employee->id }}>
+                                                    {{ $employee->id }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                        <div class="alert alert-danger" id="employee_id_error" style="display:none;"></div>
+                                        @error('employee_id')
+                                            <div class="alert alert-success">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                    <div class="w-1/2">
+                                        <x-input-label for="employee_firstname" :value="__('ชื่อจริง')" />
+                                        <x-text-input id="employee_firstname" name="employee_firstname" type="text" class="mt-1 block" style="width: 300px;" placeholder="ชื่อจริง" readonly />
+                                        <div class="alert alert-danger" id="employee_firstname_error" style="display:none;"></div>
+                                        @error('employee_firstname')
+                                            <div class="alert alert-success">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                    <div class="w-1/2">
+                                        <x-input-label for="employee_lastname" :value="__('นามสกุล')" />
+                                        <x-text-input id="employee_lastname" name="employee_lastname" type="text" class="mt-1 block" style="width: 300px;" placeholder="นามสกุล" readonly />
+                                        <div class="alert alert-danger" id="employee_lastname_error" style="display:none;"></div>
+                                        @error('employee_lastname')
+                                            <div class="alert alert-success">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                </div>
+                                <!-- บรรทัดที่สาม -->
+                                <div class="flex items-center mt-4">
+                                    <div class="flex items-center">
+                                        <div class="w-1/2">
+                                            <x-input-label for="employee_status" :value="__('สถานะ')" />
+                                            <x-text-input id="employee_status" name="employee_status" type="text" class="mt-1 block" style="width: 300px;" placeholder="สถานะ" readonly />
+                                            <div class="alert alert-danger" id="employee_status_error" style="display:none;"></div>
+                                            @error('employee_status')
+                                                <div class="alert alert-success">{{ $message }}</div>
+                                            @enderror
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- บรรทัดที่สอง -->
+                                <div class="flex flex-wrap gap-4">
+                                    <div class="w-1/2">
+                                        <x-input-label for="employee_contact_number" :value="__('เบอร์ติดต่อ')" />
+                                        <x-text-input id="employee_contact_number" name="employee_contact_number" type="text" class="mt-1 block" style="width: 300px;" placeholder="เบอร์ติดต่อ" readonly />
+                                        <div class="alert alert-danger" id="employee_contact_number_error" style="display:none;"></div>
+                                        @error('employee_contact_number')
+                                            <div class="alert alert-success">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                    <div class="w-1/2">
+                                        <x-input-label for="employee_email" :value="__('อีเมลล์')" />
+                                        <x-text-input id="employee_email" name="employee_email" type="text" class="mt-1 block" style="width: 300px;" placeholder="อีเมลล์" readonly />
+                                        <div class="alert alert-danger" id="employee_email_error" style="display:none;"></div>
+                                        @error('employee_email')
+                                            <div class="alert alert-success">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                </div>
+                                <hr class="border-gray-300 dark:border-gray-700">
+                                <h1 class="font-bold text-xl mb-4">เลือกรายการสินค้า</h1>
+                                <div class="scrollable-table-container">
+                                    <input type="hidden" name="selected_products" id="selected_products">
+                                    <table width="100%" border="1" cellpadding="5" cellspacing="0" class="text-gray-900 dark:text-gray-100">
                                         <tbody>
                                             <tr>
-                                                <td width="10%" align="left" valign="middle"><strong>รหัส</strong></td>
-                                                <td width="10%" align="left" valign="middle"><strong>ชื่อสินค้า</strong></td>
-                                                <td width="10%" align="left" valign="middle"><strong>ประเภท</strong></td>
-                                                <td width="10%" align="left" valign="middle"><strong>หน่วยนับ</strong></td>
-                                                <td width="10%" align="left" valign="middle"><strong>สี</strong></td>
-                                                <td width="10%" align="left" valign="middle"><strong>ขนาด</strong></td>
-                                                <td width="10%" align="left" valign="middle"><strong>ราคา</strong></td>
-                                                <td width="10%" align="left" valign="middle"><strong>ระบุจำนวน</strong></td>
-                                                <td width="10%" align="center" valign="middle"><strong>เลือกสินค้า</strong></td>
+                                                <td width="5%" align="left" valign="middle"><strong>รหัส</strong></td>
+                                                <td width="16%" align="left" valign="middle"><strong>ชื่อสินค้า</strong></td>
+                                                <td width="6%" align="left" valign="middle"><strong>ประเภท</strong></td>
+                                                <td width="6%" align="left" valign="middle"><strong>หน่วยนับ</strong></td>
+                                                <td width="7%" align="left" valign="middle"><strong>ขนาด</strong></td>
+                                                <td width="5%" align="left" valign="middle"><strong>ราคา</strong></td>
+                                                <td width="4%" align="center" valign="middle"><strong>Action</strong></td>
                                             </tr>
-
                                             @foreach ($products as $product)
-                                                <form action="{{ route('inventoryreport.store') }}" method="POST" enctype="multipart/form-data">
-                                                    @csrf
-                                                    <table width="100%" border="1" cellpadding="5" cellspacing="0">
-                                                        <tr>
-                                                            <!-- ข้อมูลของสินค้า -->
-                                                            <td width="10%" align="left" valign="middle">{{ $product->code }}
-                                                                <input type="hidden" name="code" value="{{ $product->code }}">
-                                                            </td>
-                                                            <td width="10%" align="left" valign="middle">{{ $product->product_name }}
-                                                                <input type="hidden" name="product_name" value="{{ $product->product_name }}">
-                                                            </td>
-                                                            <td width="10%" align="left" valign="middle">{{ $product->product_type }}
-                                                                <input type="hidden" name="product_type" value="{{ $product->product_type }}">
-                                                            </td>
-                                                            <td width="10%" align="left" valign="middle">{{ $product->unit }}
-                                                                <input type="hidden" name="unit" value="{{ $product->unit }}">
-                                                            </td>
-                                                            <td width="10%" align="left" valign="middle">{{ $product->color }}
-                                                                <input type="hidden" name="color" value="{{ $product->color }}">
-                                                            </td>
-                                                            <td width="10%" align="left" valign="middle">{{ $product->size }}
-                                                                <input type="hidden" name="size" value="{{ $product->size }}">
-                                                            </td>
-                                                            <td width="10%" align="left" valign="middle">{{ $product->price }}
-                                                                <input type="hidden" name="price" value="{{ $product->price }}">
-                                                            </td>                                                         
-                                                            <td width="10%" align="left" valign="middle">
-                                                                <x-text-input id="quuantity_products_sold{{$product->id}}" 
-                                                                              name="quuantity_products_sold{{$product->id}}" 
-                                                                              type="number" class="mt-1 block w-full" 
-                                                                              required autofocus 
-                                                                              autocomplete="quuantity_products_sold{{$product->id}}" 
-                                                                              placeholder="1"/>
-                                                            </td>
-
-                                                            <td width="10%" align="center" valign="middle">
-                                                                <!-- ปุ่มสำหรับเลือกสินค้า -->
-                                                                <input type="hidden" name="code" value="{{ $product->code }}">
-                                                                <input type="hidden" name="product_name" value="{{ $product->product_name }}">
-                                                                <input type="hidden" name="product_type" value="{{ $product->product_type }}">
-                                                                <input type="hidden" name="unit" value="{{ $product->unit }}">
-                                                                <input type="hidden" name="color" value="{{ $product->color }}">
-                                                                <input type="hidden" name="size" value="{{ $product->size }}">
-                                                                <input type="hidden" name="price" value="{{ $product->price }}">
-                                                                <input type="hidden" name="amount" value="{{ $product->amount }}">
-                                                                <!-- ปุ่มสำหรับเลือกสินค้า -->
-                                                                <button type="submit" name="selected_product" value="{{ $product->id }}">
-                                                                    <svg class="w-6 h-6 text-gray-800 dark:text-white"
-                                                                        aria-hidden="true"
-                                                                        xmlns="http://www.w3.org/2000/svg"
-                                                                        width="24" height="24" fill="none"
-                                                                        viewBox="0 0 24 24">
-                                                                        <path stroke="currentColor"
-                                                                            stroke-linecap="round"
-                                                                            stroke-linejoin="round" stroke-width="2"
-                                                                            d="M12 7.757v8.486M7.757 12h8.486M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-                                                                    </svg>
-                                                                </button>
-                                                            </td>
-                                                        </tr>
-                                                    </form>
-                                        </tbody>
-                                                    </table>
+                                            <tr>
+                                                <td width="5%" align="left" valign="middle">{{ $product->id }}</td>
+                                                <td width="16%" align="left" valign="middle">{{ $product->product_name }}</td>
+                                                <td width="6%" align="left" valign="middle">{{ $product->productType->product_type }}</td>
+                                                <td width="6%" align="left" valign="middle">{{ $product->productUnit->unit }}</td>
+                                                <td width="7%" align="left" valign="middle">{{ $product->product_width }}×{{ $product->product_length }}×{{ $product->product_height }}</td>
+                                                <td width="5%" align="left" valign="middle">{{ $product->price }}</td>
+                                                <td width="4%" align="center" valign="middle"><button type="button" class="select-btn" data-product-id="{{ $product->id }}">เลือก</button></td>
+                                            </tr>
                                             @endforeach
+                                        </tbody>
                                     </table>
-                                    {!! $products->links() !!}
+                                </div>
+                                <h1 class="font-bold text-xl mb-4">รายการสินค้า</h1>
+                                <table width="100%" border="1" cellpadding="5" cellspacing="0" class="text-gray-900 dark:text-gray-100">
+                                    <tbody>
+                                        <tr>
+                                            <td width="5%" align="left" valign="middle"><strong>รหัส</strong></td>
+                                            <td width="16%" align="left" valign="middle"><strong>ชื่อสินค้า</strong></td>
+                                            <td width="6%" align="left" valign="middle"><strong>ประเภท</strong></td>
+                                            <td width="6%" align="left" valign="middle"><strong>หน่วยนับ</strong></td>
+                                            <td width="7%" align="left" valign="middle"><strong>ขนาด</strong></td>
+                                            <td width="5%" align="left" valign="middle"><strong>ราคา</strong></td>
+                                            <td width="5%" align="left" valign="middle"><strong>จำนวน</strong></td>
+                                            <td width="4%" align="center" valign="middle"><strong>Action</strong></td>
+                                        </tr>
+                                    </tbody>
+                                    <tbody id="selectedProducts">
+                                        <!-- รายการสินค้าที่เลือกจะแสดงที่นี่ -->
+                                    </tbody>
+                                </table>
+                                <div id="total_inventory_value" class="font-bold text-xl mt-4">ราคารวม: 0.00</div>
+                                <div class="items-center gap-4">
+                                    <x-primary-button id="submit-button" type="submit">{{ __('บันทึกข้อมูล') }}</x-primary-button>
+                                </div>
+                                </div>
+                            </form>
                             </section>
                         </div>
                     </div>
@@ -110,4 +180,158 @@
             </div>
         </div>
     </div>
+
+    <script src="https://cdn.datatables.net/2.0.5/js/dataTables.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+    <script>
+        $(document).ready(function(){
+            // ตั้งค่า CSRF token ใน AJAX request headers
+            $.ajaxSetup({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                }
+            });
+        
+            $('#submit-button').click(function(event){
+                event.preventDefault(); // ป้องกันการส่งฟอร์มไปยังเซิร์ฟเวอร์
+        
+                var formData = new FormData($('#inventoryreportForm')[0]); // สร้าง FormData จากฟอร์มที่มี id="orderForm"
+        
+                $.ajax({
+                    url: '{{ route('inventoryreport.store') }}', // URL ของการส่งข้อมูล
+                    type: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function(response){
+                        // กระบวนการเมื่อสำเร็จ
+                        alert(response.message);
+                        // รีเฟรชหน้าหรือทำสิ่งอื่นตามต้องการ
+                        window.location.href = "{{ route('inventoryreport.inventoryreports') }}";
+                    },
+                    error: function(xhr){
+                        // กระบวนการเมื่อเกิดข้อผิดพลาด
+                        var errorMessage = 'เกิดข้อผิดพลาดในการบันทึกข้อมูล'; // ข้อความพื้นฐานที่จะแสดงให้ผู้ใช้
+                        if (xhr.responseJSON && xhr.responseJSON.message) {
+                            errorMessage = xhr.responseJSON.message; // ใช้ข้อความจากเซิร์ฟเวอร์ถ้ามี
+                        }
+                        alert(errorMessage); // แสดงข้อความผิดพลาดให้แก่ผู้ใช้
+                    }
+                });
+            });
+        });
+    </script>
+
+    <script>
+        $(document).ready(function() {
+            // ฟังก์ชันอัปเดตค่าที่ซ่อนและราคารวม
+            function updateSelectedProducts() {
+                var products = [];
+                var totalPrice = 0;
+
+                $('#selectedProducts tr').each(function() {
+                    var productId = $(this).find('.quantity-input').data('product-id');
+                    var quantity = $(this).find('.quantity-input').val();
+                    var price = parseFloat($(this).find('td:eq(5)').text().replace(/,/g, '')); // ดึงราคาและแปลงเป็นเลขทศนิยม
+                    totalPrice += price * quantity; // คำนวณราคารวม
+                    products.push({ id: productId, quantity: quantity });
+                });
+
+                // อัปเดต input hidden
+                $('#selected_products').val(JSON.stringify(products));
+
+                // แสดงราคารวม
+                $('#total_inventory_value').text('ราคารวม: ' + totalPrice.toFixed(2));
+            }
+
+            // เพิ่มสินค้าเข้ารายการเมื่อคลิกที่ปุ่มเลือกสินค้า
+            $('.select-btn').on('click', function() {
+                var productId = $(this).data('product-id');
+                var row = $(this).closest('tr');
+                var productName = row.find('td:eq(1)').text(); // ดึงชื่อสินค้า
+                var productType = row.find('td:eq(2)').text(); // ดึงประเภทสินค้า
+                var productUnit = row.find('td:eq(3)').text(); // ดึงหน่วยนับ
+                var productSize = row.find('td:eq(4)').text(); // ดึงขนาดสินค้า
+                var productPrice = parseFloat(row.find('td:eq(5)').text().replace(/,/g, '')); // ดึงราคาและแปลงเป็นเลขทศนิยม
+
+                // ตรวจสอบว่ามีสินค้านี้อยู่ในรายการแล้วหรือยัง
+                var existingRow = $('#selectedProducts').find(`tr:has(.quantity-input[data-product-id="${productId}"])`);
+                if (existingRow.length) {
+                    var quantityInput = existingRow.find('.quantity-input');
+                    quantityInput.val(parseInt(quantityInput.val()) + 1);
+                } else {
+                    // สร้างรายการสินค้าที่เลือก
+                    $('#selectedProducts').append(
+                        `<tr>
+                            <td width="5%" align="left" valign="middle">${productId}</td>
+                            <td width="16%" align="left" valign="middle">${productName}</td>
+                            <td width="6%" align="left" valign="middle">${productType}</td>
+                            <td width="6%" align="left" valign="middle">${productUnit}</td>
+                            <td width="7%" align="left" valign="middle">${productSize}</td>
+                            <td width="5%" align="left" valign="middle">${productPrice.toFixed(2)}</td>
+                            <td width="5%" align="left" valign="middle">
+                                <input type="number" class="quantity-input mt-1 block w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 
+                                            focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring focus:ring-indigo-500 
+                                            dark:focus:ring-indigo-600 focus:ring-opacity-50 rounded-md shadow-sm" data-product-id="${productId}" value="1" min="1">
+                            </td>
+                            <td width="4%" align="center" valign="middle">
+                                <button type="button" class="remove-btn" data-product-id="${productId}">ลบ</button>
+                            </td>
+                        </tr>`
+                    );
+                }
+                updateSelectedProducts(); // อัปเดตค่าที่ซ่อนและราคารวม
+            });
+
+            // ลบรายการสินค้า
+            $('#selectedProducts').on('click', '.remove-btn', function() {
+                $(this).closest('tr').remove();
+                updateSelectedProducts(); // อัปเดตค่าที่ซ่อนและราคารวม
+            });
+
+            // เปลี่ยนจำนวนสินค้า
+            $('#selectedProducts').on('input', '.quantity-input', function() {
+                updateSelectedProducts(); // อัปเดตค่าที่ซ่อนและราคารวม
+            });
+
+            // อัปเดตราคารวมเมื่อโหลดหน้า
+            updateSelectedProducts();
+        });
+    </script>      
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const employeeSelect = document.getElementById('employee_id');
+        
+            // ฟังก์ชันในการดึงข้อมูลพนักงาน
+            async function getEmployeeDetails(employeeId) {
+                if (!employeeId) return;
+        
+                try {
+                    const response = await fetch(`/employee-details-inventoryreport/${employeeId}`);
+                    if (!response.ok) {
+                        throw new Error('Employee not found');
+                    }
+                    const data = await response.json();
+                    // แสดงข้อมูลในฟิลด์ที่อ่านได้
+                    document.getElementById('employee_firstname').value = data.employee.firstname;
+                    document.getElementById('employee_lastname').value = data.employee.lastname;
+                    document.getElementById('employee_contact_number').value = data.employee.contact_number;
+                    document.getElementById('employee_email').value = data.employee.email;
+                    document.getElementById('employee_status').value = data.employee.status;
+                } catch (error) {
+                    console.error('Error fetching employee details:', error);
+                    // จัดการข้อผิดพลาดที่เหมาะสม
+                }
+            }
+        
+            // ตรวจจับการเปลี่ยนแปลงใน dropdown
+            employeeSelect.addEventListener('change', function () {
+                const selectedEmployeeId = this.value;
+                getEmployeeDetails(selectedEmployeeId);
+            });
+        
+        });
+        </script>
 </x-appadmin-layout>

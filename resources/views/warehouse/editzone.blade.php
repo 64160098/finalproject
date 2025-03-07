@@ -12,7 +12,7 @@
                     <div class="contrainer mt-2">
                         <div class="row">
                             <div class="flex items-center gap-4">
-                                <p class="bread"><span><a href="{{ route('warehouse.zone', ['id' => $warehouse->id]) }}"
+                                <p class="bread"><span><a href="{{ route('warehouse.warehouses') }}"
                                             class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-800 hover:text-gray-700 dark:hover:text-gray-300 focus:outline-none transition ease-in-out duration-150">ย้อนกลับ</a></span>
                                     / <span>แก้ไขข้อมูลโซน</span></p>
                             </div>
@@ -94,13 +94,15 @@
                                         <!-- บรรทัดแรก -->
                                         <div class="w-1/2">
                                             <x-input-label for="product_id" :value="__('รหัสสินค้า')" />
-                                            <select id="product_id" name="product_id" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50" style="width: 200px;" required>
+                                            <select id="product_id" name="product_id" class="mt-1 block w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 
+                                            focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring focus:ring-indigo-500 
+                                            dark:focus:ring-indigo-600 focus:ring-opacity-50 rounded-md shadow-sm" style="width: 200px;" required>
                                                 <!-- แสดง product ที่สัมพันธ์กับ zone ที่กำลังแก้ไขเป็นค่าเริ่มต้น -->
                                                 <option value="">เลือกรหัสสินค้า</option>
                                                 <!-- แสดงรายการสินค้าทั้งหมดใน select dropdown -->
-                                                @foreach($products as $productItem)
-                                                    <option value="{{ $productItem->id }}" {{ $productItem->id == $product->id ? 'selected' : '' }}>
-                                                        {{ $productItem->id }}
+                                                @foreach($products as $supplierId)
+                                                    <option value="{{ $supplierId->id }}" {{ $supplierId->id == $product->id ? 'selected' : '' }}>
+                                                        {{ $supplierId->id }}
                                                     </option>
                                                 @endforeach
                                             </select>
@@ -242,7 +244,7 @@
                         // กระบวนการเมื่อสำเร็จ
                         console.log(response); // แสดงผลลัพธ์ในคอนโซล
                         alert('แก้ไขข้อมูลโซนเรียบร้อยแล้ว');
-                        window.location.href = "{{ route('warehouse.zone', ['id' => $warehouse->id]) }}";
+                        window.location.href = "{{ route('warehouse.warehouses') }}";
                     },
                     error: function(xhr){
                         // กระบวนการเมื่อเกิดข้อผิดพลาด

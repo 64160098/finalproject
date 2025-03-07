@@ -32,10 +32,17 @@ class Warehouse extends Model
         return $this->hasMany(Product::class);
     }
 
+    // เพิ่มความสัมพันธ์กับ EoqropCalculation
+    public function eoqropCalculations() {
+        return $this->hasMany(EoqropCalculation::class, 'warehouse_id');
+    }
+
     public function toSearchableArray()
     {
         return [
             'id' => $this->id,
+            'name' => $this->name,
+            'status' => $this->status,
         ];
     }
 }

@@ -1,34 +1,3 @@
-<?php
-$totalQuantity = 0;
-$totalCost = 0;
-
-    foreach ($receiveproducts as $receiveproduct) {
-    $totalQuantity += $receiveproduct->quantity_products_received;
-    $totalCost += $receiveproduct->quantity_products_received * $receiveproduct->cost_unit;
-}
-?>
-
-<style>
-    #quantity_products_received {
-    width: 70%; /* หรือความกว้างที่คุณต้องการ */
-}
-.alert {
-    padding: 10px; /* ลด padding */
-    margin-bottom: 10px; /* ลด margin */
-    border: 1px solid transparent;
-    border-radius: 4px;
-    position: relative;
-    width: 100%; /* ปรับความกว้าง */
-    margin: 10px 0; /* จัดกลาง */
-    font-size: 15px; /* ปรับขนาดตัวอักษร */
-}
-.alert-success {
-    color: #155724;
-    background-color: #d4edda;
-    border-color: #c3e6cb;
-}
-</style>
-<link rel="stylesheet" href="https://cdn.datatables.net/2.0.5/css/dataTables.dataTables.min.css">
 <x-appadmin-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
@@ -40,114 +9,234 @@ $totalCost = 0;
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900 dark:text-gray-100">
-                    <div class="container mt-2">
-                        <div class="space-y-6">
+                    <div class="contrainer mt-2">
                             <div>
-                                <a href="{{ route('receiveproduct.create') }}" class=""><x-primary-button>เลือกข้อมูลสินค้า</x-primary-button></a>
+                                <a href="{{ route('receiveproduct.create') }}" class="">
+                                    <x-primary-button style="background-color: #28A745; color: white; text-shadow: 1px 1px 2px black;">
+                                        เลือกข้อมูลใบสั่งซื้อ
+                                    </x-primary-button>
+                                </a>
                             </div>
                             @if ($message = Session::get('success'))
                             <div class="alert alert-success">
                                 <p>{{ $message }}</p>
                             </div>
                             @endif
-                                <table id="producttable" width="100%" border="1" cellpadding="5" cellspacing="0">
-                                    <tbody>
-                                        <tr>
-                                            <td width="10%" align="left" valign="middle">
-                                                <input type="checkbox" id="select-all-checkbox">
-                                            </td>
-                                            <td width="10%" align="left" valign="middle"><strong>รหัสสินค้า</strong></td>
-                                            <td width="10%" align="left" valign="middle"><strong>ชื่อสินค้า</strong></td>
-                                            <td width="10%" align="left" valign="middle"><strong>จำนวนสินค้าที่รับ</strong></td>
-                                            <td width="10%" align="left" valign="middle"><strong>หน่วยนับ</strong></td>
-                                            <td width="10%" align="left" valign="middle"><strong>ต้นทุน/หน่วย</strong></td>
-                                            <td width="10%" align="left" valign="middle"><strong>เป็นเงินทั้งหมด</strong></td>
-                                            <td width="10%" align="center" valign="middle"><strong>แก้ไข</strong></td>
-                                            <td width="10%" align="center" valign="middle"><strong>ลบ</strong></td>
-                                        </tr>
-                                        
-                                        @foreach ($receiveproducts as $receiveproduct)
-                                        <tr>
-                                            <form class="product-form" action="{{ route('orderhistory.store') }}" method="POST" enctype="multipart/form-data">
-                                                @csrf
-                                                <input type="hidden" name="code" value="{{ $receiveproduct->code }}">
-                                                <input type="hidden" name="product_name" value="{{ $receiveproduct->product_name }}">
-                                                <input type="hidden" name="quantity_products_received" value="{{ $receiveproduct->quantity_products_received }}">
-                                                <input type="hidden" name="unit" value="{{ $receiveproduct->unit }}">
-                                                <input type="hidden" name="cost_unit" value="{{ $receiveproduct->cost_unit }}">
-                                                <input type="hidden" name="total" value="{{ $receiveproduct->total }}">
-
-                                            <td width="10%" align="left" valign="middle">
-                                                <input type="checkbox" name="selected_products[]" value="{{ $receiveproduct->id }}">
-                                            </td>
-                                            <td width="10%" align="left" valign="middle">{{ $receiveproduct->code }}
-                                                <input type="hidden" name="code" value="{{ $receiveproduct->code }}">
-                                            </td>
-                                            <td width="10%" align="left" valign="middle">{{ $receiveproduct->product_name }}
-                                                <input type="hidden" name="product_name" value="{{ $receiveproduct->product_name }}">
-                                            </td>
-                                            <td width="10%" align="left" valign="middle">{{ $receiveproduct->quantity_products_received }}
-                                                <input type="hidden" name="quantity_products_received" value="{{ $receiveproduct->quantity_products_received }}">
-                                            </td>
-                                            <td width="10%" align="left" valign="middle">{{ $receiveproduct->unit }}
-                                                <input type="hidden" name="unit" value="{{ $receiveproduct->unit }}">
-                                            </td>
-                                            <td width="10%" align="left" valign="middle">{{ $receiveproduct->cost_unit }}
-                                                <input type="hidden" name="cost_unit" value="{{ $receiveproduct->cost_unit }}">
-                                            </td>
-                                            <td width="10%" align="left" valign="middle">{{ $receiveproduct->total }}
-                                                <input type="hidden" name="total" value="{{ $receiveproduct->total }}">
-                                            </td>
-                                            </form>  
-                                            <td width="10%" align="center" valign="middle">
-                                                <a href="{{ route('receiveproduct.edit', $receiveproduct->id) }}">
-                                                    <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
-                                                        <path fill-rule="evenodd" d="M11.32 6.176H5c-1.105 0-2 .949-2 2.118v10.588C3 20.052 3.895 21 5 21h11c1.105 0 2-.948 2-2.118v-7.75l-3.914 4.144A2.46 2.46 0 0 1 12.81 16l-2.681.568c-1.75.37-3.292-1.263-2.942-3.115l.536-2.839c.097-.512.335-.983.684-1.352l2.914-3.086Z" clip-rule="evenodd"/>
-                                                        <path fill-rule="evenodd" d="M19.846 4.318a2.148 2.148 0 0 0-.437-.692 2.014 2.014 0 0 0-.654-.463 1.92 1.92 0 0 0-1.544 0 2.014 2.014 0 0 0-.654.463l-.546.578 2.852 3.02.546-.579a2.14 2.14 0 0 0 .437-.692 2.244 2.244 0 0 0 0-1.635ZM17.45 8.721 14.597 5.7 9.82 10.76a.54.54 0 0 0-.137.27l-.536 2.84c-.07.37.239.696.588.622l2.682-.567a.492.492 0 0 0 .255-.145l4.778-5.06Z" clip-rule="evenodd"/>
-                                                    </svg>แก้ไข
-                                                </a> 
-                                            </td>
-                                            <td width="10%" align="center" valign="middle"> 
-                                                <a href="#" class="delete-button" data-id="{{ $receiveproduct->id }}">
-                                                    <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
-                                                        <path fill-rule="evenodd" d="M8.586 2.586A2 2 0 0 1 10 2h4a2 2 0 0 1 2 2v2h3a1 1 0 1 1 0 2v12a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V8a1 1 0 0 1 0-2h3V4a2 2 0 0 1 .586-1.414ZM10 6h4V4h-4v2Zm1 4a1 1 0 1 0-2 0v8a1 1 0 1 0 2 0v-8Zm4 0a1 1 0 1 0-2 0v8a1 1 0 1 0 2 0v-8Z" clip-rule="evenodd"/>
-                                                    </svg>ลบ
-                                                </a>
-                                            </td>
-                                        </tr>   
-                                        @endforeach
-                                    </tbody>
-                                </table>
-
-                        <div class="p-6 text-gray-900 dark:text-gray-100">
-                            <div class="container mt-2">
-                                <div class="space-y-6">
-                                    <div class="p-4 bg-white dark:bg-gray-800 shadow sm:rounded-lg flex items-center gap-4">
-                                    <table width="100%" border="0" cellspacing="0" cellpadding="0" class="custom-table">
-                                        <tbody>
-                                        <tr>
-                                          <td width="12%" align="left" valign="middle">จำนวนสินค้ารวม :</td>
-                                          <td width="10%">{{ $totalQuantity }}</td>
-                                        </tr>
+                            <section>
+                            <form id="receive-product-form" method="POST" action="{{ route('receiveproduct.store') }}">
+                            @csrf
+                            <div class="space-y-6">
+                            <hr class="my-4 border-gray-300 dark:border-gray-700 mt-6"> 
+                            <div class="flex flex-wrap gap-4">
+                                <div class="w-1/2">
+                                    <x-input-label for="received_date" :value="__('วันที่รับสินค้า')" />
+                                    <x-text-input wire:model="received_date" value="{{ old('received_date', $currentDate) }}" id="received_date" name="received_date" type="date" class="mt-1 block" style="width: 300px;" required autofocus autocomplete="received_date" placeholder="วันที่รับสินค้า" />
+                                    <div class="alert alert-danger" id="received_date_error" style="display:none;"></div>
+                                    @error('received_date')
+                                        <div class="alert alert-success">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>                            
+                            <hr class="my-4 border-gray-300 dark:border-gray-700"> 
+                            <h1 class="font-bold text-xl mb-4">รายละเอียด</h1>
+                            <div class="flex flex-wrap gap-4">
+                                <div class="w-1/2">
+                                    <x-input-label for="order_id" :value="__('เลขที่ใบสั่งซื้อ')" />
+                                    <x-text-input wire:model="order_id" id="order_id" name="order_id" type="text" class="mt-1 block" style="width: 300px;" required autofocus autocomplete="order_id" placeholder="เลขที่ใบสั่งซื้อ" readonly
+                                        value="{{ optional($ordernow)->id ?? 'กรุณาเลือกข้อมูลใบสั่งซื้อ' }}" />
+                                    <div class="alert alert-danger" id="order_id_error" style="display:none;"></div>
+                                    @error('order_id')
+                                        <div class="alert alert-success">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>  
+                            <!-- บรรทัดที่สอง -->
+                            <div class="flex items-center mt-4">
+                                <div class="flex items-center">
+                                    <div class="w-24">
+                                        <x-input-label for="order_date" :value="__('วันที่สั่งซื้อ')" />
+                                        <x-text-input wire:model="order_date" id="order_date" name="order_date" type="text" class="mt-1 block" style="width: 300px;" required autofocus autocomplete="order_date" 
+                                            value="{{ optional($ordernow)->order_date }}" readonly />
+                                        <div class="alert alert-danger" id="order_date_error" style="display:none;"></div>
+                                        @error('order_date')
+                                            <div class="alert alert-success">{{ $message }}</div>
+                                        @enderror
                                     </div>
-                                    <br>
-                                    <div class="p-4 bg-white dark:bg-gray-800 shadow sm:rounded-lg flex items-center gap-4">
-                                        <tr>
-                                          <td width="10%" margin-top="50%" align="left" valign="middle">ราคาต้นทุนรวม :</td>
-                                          <td width="50%">{{ $totalCost }}</td>
-                                          <td id="total_price"></td>
-                                        </tr>
-                                        </tbody>
-                                    </table>
-                                    </div>
+                                </div>
                             </div>
-                        </div>
-                        </div>
+                            <hr class="my-4 border-gray-300 dark:border-gray-700">                                           
+                            <h3 class="text-l mb-4"><strong>ข้อมูลผู้ขาย</strong></h3>
+                            <div class="flex flex-wrap gap-4">
+                                <div class="w-1/2">
+                                    <x-input-label for="supplier_id" :value="__('เลขที่บริษัท')" />
+                                    <x-text-input wire:model="supplier_id" id="supplier_id" name="supplier_id" type="text" class="mt-1 block" style="width: 300px;" required autofocus autocomplete="supplier_id" 
+                                        value="{{ optional($supplier)->id }}" readonly />
+                                    <div class="alert alert-danger" id="supplier_id_error" style="display:none;"></div>
+                                    @error('supplier_id')
+                                        <div class="alert alert-success">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                                <div class="w-1/2">
+                                    <x-input-label for="supplier_name" :value="__('ชื่อบริษัท')" />
+                                    <x-text-input wire:model="supplier_name" id="supplier_name" name="supplier_name" type="text" class="mt-1 block" style="width: 300px;" 
+                                        value="{{ optional($supplier)->supplier_name }}" readonly />
+                                    <div class="alert alert-danger" id="supplier_name_error" style="display:none;"></div>
+                                    @error('supplier_name')
+                                        <div class="alert alert-success">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
+
+                            <!-- บรรทัดที่สอง -->
+                            <div class="flex items-center mt-4">
+                                <div class="flex items-center">
+                                    <div class="w-24">
+                                        <x-input-label for="supplier_product" :value="__('จำหน่ายสินค้าประเภท')" />
+                                        <x-text-input wire:model="supplier_product" id="supplier_product" name="supplier_product" type="text" class="mt-1 block" style="width: 300px;" 
+                                            value="{{ optional($supplier)->supplier_product }}" readonly />
+                                        <div class="alert alert-danger" id="supplier_product_error" style="display:none;"></div>
+                                        @error('supplier_product')
+                                            <div class="alert alert-success">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- บรรทัดที่สาม -->
+                            <div class="flex flex-wrap gap-4">
+                                <div class="w-24">
+                                    <x-input-label for="supplier_name" :value="__('ชื่อผู้ติดต่อ')" />
+                                    <x-text-input wire:model="supplier_name" id="supplier_name" name="supplier_name" type="text" class="mt-1 block" style="width: 300px;" 
+                                        value="{{ optional($supplier)->supplier_name }}" readonly />
+                                    <div class="alert alert-danger" id="supplier_name_error" style="display:none;"></div>
+                                    @error('supplier_name')
+                                        <div class="alert alert-success">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                                <div class="w-24">
+                                    <x-input-label for="supplier_contact_number" :value="__('เบอร์ติดต่อ')" />
+                                    <x-text-input wire:model="supplier_contact_number" id="supplier_contact_number" name="supplier_contact_number" type="text" class="mt-1 block" style="width: 300px;" 
+                                        value="{{ optional($supplier)->supplier_contact_number }}" readonly />
+                                    <div class="alert alert-danger" id="supplier_contact_number_error" style="display:none;"></div>
+                                    @error('supplier_contact_number')
+                                        <div class="alert alert-success">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                                <div class="w-24">
+                                    <x-input-label for="supplier_email" :value="__('อีเมลล์')" />
+                                    <x-text-input wire:model="supplier_email" id="supplier_email" name="supplier_email" type="text" class="mt-1 block" style="width: 300px;" 
+                                        value="{{ optional($supplier)->supplier_email }}" readonly />
+                                    <div class="alert alert-danger" id="supplier_email_error" style="display:none;"></div>
+                                    @error('supplier_email')
+                                        <div class="alert alert-success">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
+                            
+                            <hr class="my-4 border-gray-300 dark:border-gray-700"> 
+
+                            <h3 class="text-l mb-4"><strong>ข้อมูลผู้สั่งซื้อ</strong></h3>
+
+                            <div class="flex flex-wrap gap-4">
+                                <!-- ช่องกรอกรหัสพนักงาน -->
+                                <div class="w-1/2">
+                                    <x-input-label for="employee_id" :value="__('รหัสพนักงาน')" />
+                                    <x-text-input wire:model="employee_id" id="employee_id" name="employee_id" type="text" class="mt-1 block" style="width: 300px;" required autofocus autocomplete="employee_id"
+                                        value="{{ optional($employee)->id }}" readonly />
+                                    <div class="alert alert-danger" id="employee_id_error" style="display:none;"></div>
+                                    @error('employee_id')
+                                        <div class="alert alert-success">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                                <!-- ช่องกรอกชื่อ-นามสกุล -->
+                                <div class="w-1/2">
+                                    <x-input-label for="employee_name" :value="__('ชื่อ-นามสกุล')" />
+                                    <x-text-input wire:model="employee_name" id="employee_name" name="employee_name" type="text" class="mt-1 block" style="width: 300px;" 
+                                        value="{{ optional($employee)->employee_firstname }} {{ optional($employee)->employee_lastname }}" readonly />
+                                    <div class="alert alert-danger" id="employee_name_error" style="display:none;"></div>
+                                    @error('employee_name')
+                                        <div class="alert alert-success">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
+                            
+                            <div class="flex flex-wrap gap-4 mt-4">
+                                <!-- ช่องกรอกสถานะ -->
+                                <div class="w-1/2">
+                                    <x-input-label for="employee_status" :value="__('สถานะ')" />
+                                    <x-text-input wire:model="employee_status" id="employee_status" name="employee_status" type="text" class="mt-1 block" style="width: 300px;" 
+                                        value="{{ optional($employee)->employee_status }}" readonly />
+                                    <div class="alert alert-danger" id="employee_status_error" style="display:none;"></div>
+                                    @error('employee_status')
+                                        <div class="alert alert-success">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
+                            
+                            <div class="flex flex-wrap gap-4 mt-4">
+                                <!-- ช่องกรอกเบอร์ติดต่อ -->
+                                <div class="w-1/2">
+                                    <x-input-label for="employee_contact_number" :value="__('เบอร์ติดต่อ')" />
+                                    <x-text-input wire:model="employee_contact_number" id="employee_contact_number" name="employee_contact_number" type="text" class="mt-1 block" style="width: 300px;" 
+                                        value="{{ optional($employee)->employee_contact_number }}" readonly />
+                                    <div class="alert alert-danger" id="employee_contact_number_error" style="display:none;"></div>
+                                    @error('employee_contact_number')
+                                        <div class="alert alert-success">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                                <!-- ช่องกรอกอีเมลล์ -->
+                                <div class="w-1/2">
+                                    <x-input-label for="employee_email" :value="__('อีเมลล์')" />
+                                    <x-text-input wire:model="employee_email" id="employee_email" name="employee_email" type="text" class="mt-1 block" style="width: 300px;" 
+                                        value="{{ optional($employee)->employee_email }}" readonly />
+                                    <div class="alert alert-danger" id="employee_email_error" style="display:none;"></div>
+                                    @error('employee_email')
+                                        <div class="alert alert-success">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
+                            
+                            <hr class="my-4 border-gray-300 dark:border-gray-700"> 
+                            <h3 class="text-l mb-4"><strong>สินค้าที่สั่งซื้อ</strong></h3>
+                            <table width="100%" border="1" cellpadding="5" cellspacing="0">
+                                <tbody>
+                                    <tr>
+                                        <td width="10%" align="left" valign="middle"><strong>ชื่อสินค้า</strong></td>
+                                        <td width="5%" align="left" valign="middle"><strong>จำนวนที่สั่ง</strong></td>
+                                        <td width="5%" align="left" valign="middle"><strong>จำนวน ณ วันรับ</strong></td>
+                                        <td width="5%" align="left" valign="middle"><strong>หน่วยนับ</strong></td>
+                                        <td width="5%" align="left" valign="middle"><strong>ราคา</strong></td>
+                                    </tr>
+                                    @foreach ($productDetails as $index => $product)
+                                    <tr>
+                                        <td>{{ $product->product_name }}</td>
+                                        <input type="hidden" name="products[{{ $index }}][id]" value="{{ $product->id }}">
+                                        <input type="hidden" name="products[{{ $index }}][ordered_quantity]" value="{{ $product->quantity }}">
+                                        <td>{{ $product->quantity }}</td>
+                                        <td>
+                                            <x-text-input type="number" name="products[{{ $index }}][received_quantity]" value="" min="0" class="mt-1 block w-full" style="max-width: 100px;" />
+                                        </td>
+                                        <td>{{ $product->productUnit->unit }}</td>
+                                        <td>{{ $product->price }}</td>
+                                    </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                            <div class="flex items-center" style="margin-right: 20px;">
+                                <strong>ราคารวม:</strong> 
+                                <x-text-input type="text" name="total_price" id="total_price" value="{{ old('total_price', optional($ordernow)->total_price) }}" style="margin-left: 5px;" required autofocus autocomplete="total_price" readonly />
+                            </div>
+                            <div class="flex items-center" style="margin-right: 20px;">
+                                <strong>ราคารวม ณ วันที่จ่ายจริง:</strong> 
+                                <x-text-input type="text" name="total_price_at_received_date" id="total_price_at_received_date" value="{{ old('total_price_at_received_date', '0.00') }}" style="margin-left: 5px;" required autofocus autocomplete="total_price_at_received_date" readonly />
+                            </div>                         
+                            
                         <div id="submit-btn">
                             <x-primary-button id="confirm-button"> ยืนยันการรับสินค้า </x-primary-button>
-                            <x-primary-button id="cancel-button"> ยกเลิก </x-primary-button>
-                        </div>       
+                        </div>   
                     </div>
+                </form>
+                </section> 
                 </div>
             </div>
         </div>
@@ -165,72 +254,101 @@ $totalCost = 0;
             $('#confirm-button').click(function(event){
                 event.preventDefault(); // ป้องกันการส่งฟอร์มไปยังเซิร์ฟเวอร์
 
-                // ตรวจสอบว่ามีสินค้าที่ถูกเลือกหรือไม่
-                if ($('input[name="selected_products[]"]:checked').length === 0) {
-                    // ถ้าไม่มีสินค้าถูกเลือก ให้แสดงข้อความแจ้งเตือน
-                    alert('กรุณาเลือกสินค้าอย่างน้อย 1 รายการ');
-                    return;
-                }
-        
-                var formDataArray = []; // สร้างอาเรย์เพื่อเก็บข้อมูลจากแต่ละฟอร์ม
-        
-                // วนลูปผ่านฟอร์มแต่ละฟอร์มเพื่อรวมข้อมูลและเก็บไว้ใน formDataArray
-                $('form.product-form').each(function(){
-                    var formData = $(this).serialize(); // รวมข้อมูลจากฟอร์มที่ถูกส่งเข้ามา
-                    formDataArray.push(formData); // เพิ่มข้อมูลเข้าไปในอาเรย์
-                });
-        
-                // ส่งข้อมูลไปยังเซิร์ฟเวอร์
-                $.ajax({
-                    url: "{{ route('orderhistory.store') }}", // URL ของการส่งข้อมูล
-                    type: 'POST',
-                    data: formDataArray.join('&'), // ข้อมูลที่จะส่ง
-                    success: function(response){
-                        // กระบวนการเมื่อสำเร็จ
-                        console.log(response); // แสดงผลลัพธ์ในคอนโซล
-                        window.location.href = "{{ route('orderhistory.orderhistorys') }}";
-                        alert('บันทึกข้อมูลการรับสินค้าเรียบร้อยแล้ว');
-                        
-                        // ลบข้อมูลหลังจากการบันทึกสำเร็จ
-                        $.ajax({
-                            url: "{{ route('receiveproduct.deleteAll') }}",
-                            type: 'DELETE',
-                            headers: {
-                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                            },
-                            success: function(deleteResponse) {
-                                console.log(deleteResponse); // แสดงผลลัพธ์ในคอนโซล
-                                alert('ข้อมูลถูกลบแล้ว'); // แสดง alert
-                                location.reload(); // รีโหลดหน้าเพจใหม่
-                            },
-                            error: function(deleteError) {
-                                console.error('Error:', deleteError);
-                            }
-                        });
-                    },
-                    error: function(error){
-                        // กระบวนการเมื่อเกิดข้อผิดพลาด
-                        console.error('Error:', error);
+                var formData = $('#receive-product-form').serializeArray();
+                var productData = {}; // เก็บข้อมูลสินค้า
+                var isValid = true;
+
+                // รวบรวมข้อมูลสินค้าในรูปแบบอาร์เรย์
+                $.each(formData, function(i, field) {
+                    if (field.name.startsWith('products[')) {
+                        var index = field.name.match(/\[(\d+)\]/)[1];
+                        if (!productData[index]) {
+                            productData[index] = {};
+                        }
+                        productData[index][field.name.split('][')[1].split(']')[0]] = field.value;
                     }
                 });
+
+                // ตรวจสอบจำนวนที่กรอกไม่เกินจำนวนที่มีอยู่
+                $.each(productData, function(index, product) {
+                    var orderedQuantity = parseInt(product['ordered_quantity'], 10);
+                    var receivedQuantity = parseInt(product['received_quantity'], 10);
+
+                    if (receivedQuantity > orderedQuantity) {
+                        alert('จำนวนที่รับสินค้าไม่สามารถเกินจำนวนที่สั่งซื้อได้');
+                        isValid = false;
+                        return false; // ออกจาก loop
+                    }
+                });
+
+                if (isValid) {
+                    // ตรวจสอบว่ามีข้อมูลใบสั่งซื้อตัวใดถูกเลือกหรือไม่
+                    var hasData = false;
+                    $.each(productData, function(index, product) {
+                        if (product['received_quantity'] && product['received_quantity'] > 0) {
+                            hasData = true;
+                            return false; // ออกจาก loop
+                        }
+                    });
+
+                    if (!hasData) {
+                        alert('กรุณาเลือกข้อมูลใบสั่งซื้อเพื่อทำรายการ');
+                        return;
+                    }
+
+                    // แสดงกล่องยืนยันก่อนส่งข้อมูล
+                    if (confirm('กรุณาตรวจสอบข้อมูลให้ครบถ้วนก่อนกดยืนยัน')) {
+                        // ส่งข้อมูลไปยังเซิร์ฟเวอร์ถ้าผู้ใช้กดยืนยัน
+                        $.ajax({
+                            url: "{{ route('receiveproduct.store') }}",
+                            type: 'POST',
+                            data: formData,
+                            success: function(response){
+                                if (response.success) {
+                                    alert('รับสินค้าสำเร็จ');
+                                    window.location.href = "{{ route('orderhistory.orderhistorys') }}";
+                                } else {
+                                    console.error('Unexpected response format:', response);
+                                    alert('กรุณาเลือกข้อมูลใบสั่งซื้อเพื่อทำรายการ');
+                                }
+                            },
+                            error: function(xhr, status, error){
+                                console.error('Error:', error);
+                                alert('กรุณาเลือกข้อมูลใบสั่งซื้อเพื่อทำรายการ');
+                            }
+                        });
+                    }
+                }
             });
         });
     </script>
 
     <script>
         $(document).ready(function(){
-            // เมื่อคลิกที่ปุ่ม "เลือกทั้งหมด"
-            $('#select-all-checkbox').click(function(){
-                // เมื่อปุ่มถูกคลิก ตรวจสอบว่า checkbox ที่มี id เป็น "select-all-checkbox" ถูกเลือกหรือไม่
-                var selectAllChecked = $('#select-all-checkbox').prop('checked');
-                
-                // หาก checkbox ถูกเลือก ให้เลือกทุก checkbox ที่มีชื่อเป็น "selected_products[]"
-                if(selectAllChecked) {
-                    $('input[name="selected_products[]"]').prop('checked', true);
-                } else {
-                    // ถ้า checkbox ไม่ถูกเลือก ให้ยกเลิกการเลือกทุก checkbox ที่มีชื่อเป็น "selected_products[]"
-                    $('input[name="selected_products[]"]').prop('checked', false);
-                }
+            // ฟังก์ชันคำนวณราคารวม
+            function calculateTotalPrice() {
+                var totalPrice = 0;
+
+                // วนลูปผ่านแต่ละแถวในตารางเพื่อคำนวณราคารวม
+                $('table tbody tr').each(function(){
+                    var price = parseFloat($(this).find('td').eq(4).text()); // ราคา
+                    var receivedQuantity = parseFloat($(this).find('input[name*="[received_quantity]"]').val()); // จำนวน ณ วันรับ
+
+                    if (!isNaN(price) && !isNaN(receivedQuantity)) {
+                        totalPrice += price * receivedQuantity; // คำนวณราคาสำหรับแต่ละรายการ
+                    }
+                });
+
+                // แสดงราคารวมในช่อง "ราคารวม ณ วันที่จ่ายจริง"
+                $('#total_price_at_received_date').val(totalPrice.toFixed(2)); // ตั้งค่าเป็นค่า 2 ตำแหน่งทศนิยม
+            }
+
+            // เรียกใช้ฟังก์ชันคำนวณเมื่อโหลดหน้าเว็บ
+            calculateTotalPrice();
+
+            // เพิ่มการฟังเหตุการณ์เพื่อคำนวณใหม่เมื่อข้อมูลเปลี่ยนแปลง
+            $('input[name*="[received_quantity]"]').on('input', function() {
+                calculateTotalPrice();
             });
         });
     </script>
@@ -258,39 +376,6 @@ $totalCost = 0;
                     });
                 }
             });
-        });
-    </script>
-
-    <script>
-        $('.delete-button').click(function(event){
-            event.preventDefault(); // ป้องกันการทำงานเริ่มต้นของปุ่ม
-
-            // แสดงตัวยืนยันการลบ
-            var confirmDelete = confirm('คุณแน่ใจหรือไม่ว่าต้องการลบรายการนี้?');
-            
-            // ถ้าผู้ใช้ยืนยันการลบ
-            if (confirmDelete) {
-                var productId = $(this).data('id');
-                
-                // ส่งคำขอลบไปยังเซิร์ฟเวอร์
-                $.ajax({
-                    url: "{{ route('receiveproduct.destroy', ':id') }}".replace(':id', productId),
-                    type: 'DELETE',
-                    data: {
-                        "_token": "{{ csrf_token() }}"
-                    },
-                    success: function(response){
-                        // แสดงการแจ้งเตือนหลังจากการลบข้อมูล
-                        alert(response.success);
-                        // รีเฟรชหน้าหรือทำสิ่งอื่นตามต้องการ
-                        window.location.href = "{{ route('receiveproduct.receiveproducts') }}";
-                    },
-                    error: function(xhr){
-                        console.error('Error:', xhr);
-                        alert('เกิดข้อผิดพลาดในการลบข้อมูล');
-                    }
-                });
-            }
         });
     </script>
 

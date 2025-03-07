@@ -53,7 +53,9 @@
                                     <div class="p-4 bg-white dark:bg-gray-800 shadow sm:rounded-lg flex items-center gap-4">
                                         <div>
                                             <x-input-label for="product_type_id" :value="__('ประเภท')" />
-                                            <select class="form-select" name="product_type_id">
+                                            <select name="product_type_id" class="mt-1 block w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 
+                                            focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring focus:ring-indigo-500 
+                                            dark:focus:ring-indigo-600 focus:ring-opacity-50 rounded-md shadow-sm" style="width: 200px;">
                                                 <option value="" selected>-</option>
                                                 @foreach($producttypes as $row)
                                                     <option value="{{ $row->id }}" {{ $row->id == old('product_type_id', $product->product_type_id) ? 'selected' : '' }}>
@@ -69,7 +71,9 @@
                                     <div class="p-4 bg-white dark:bg-gray-800 shadow sm:rounded-lg flex items-center gap-4">
                                         <div>
                                             <x-input-label for="product_unit_id" :value="__('หน่วยนับ')" />
-                                            <select class="form-select" name="product_unit_id">
+                                            <select name="product_unit_id" class="mt-1 block w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 
+                                            focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring focus:ring-indigo-500 
+                                            dark:focus:ring-indigo-600 focus:ring-opacity-50 rounded-md shadow-sm" style="width: 200px;">
                                                 <option value="" selected>-</option>
                                                 @foreach ($units as $row)
                                                     <option value="{{ $row->id }}" {{ $row->id == old('product_unit_id', $product->product_unit_id) ? 'selected' : '' }}>

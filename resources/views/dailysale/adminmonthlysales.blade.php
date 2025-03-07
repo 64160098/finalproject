@@ -23,7 +23,9 @@
                                 <form method="GET" action="{{ route('dailysale.adminmonthlysales') }}">
                                 <div class="form-group">
                                     <label for="year">เลือกปี:</label>
-                                    <select id="year" name="year" class="form-control" onchange="this.form.submit()">
+                                    <select id="year" name="year" class="mt-1 block w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 
+                                            focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring focus:ring-indigo-500 
+                                            dark:focus:ring-indigo-600 focus:ring-opacity-50 rounded-md shadow-sm" onchange="this.form.submit()">
                                         @for ($i = 2019; $i <= \Carbon\Carbon::now()->year; $i++)
                                             <option value="{{ $i }}" {{ $i == $selectedYear ? 'selected' : '' }}>
                                                 {{ $i }}
@@ -38,7 +40,7 @@
                                 <p>{{ $message }}</p>
                             </div>
                             @endif
-                            <table id="dailysaletable" width="100%" border="1" cellpadding="5" cellspacing="0">
+                            <table id="dailysaletable" width="100%" border="1" cellpadding="5" cellspacing="0" class="text-gray-900 dark:text-gray-100">
                                 <tbody>
                                     <tr>
                                         <td width="25%" align="center" valign="middle"><strong>เดือน</strong></td>
@@ -59,7 +61,7 @@
                                 <div class="container mt-2">
                                     <div class="space-y-6">
                                         <div class="p-4 bg-white dark:bg-gray-800 shadow sm:rounded-lg flex items-center gap-4">
-                                        <table width="100%" border="0" cellspacing="0" cellpadding="0" class="table table-condensed">
+                                        <table width="100%" border="0" cellspacing="0" cellpadding="0" class="text-gray-900 dark:text-gray-100">
                                             <tbody>
                                             <tr>
                                               <td width="12%" align="left" valign="middle">ยอดขายรวมทั้งหมด :</td>
@@ -79,9 +81,6 @@
 
     <script src="https://cdn.datatables.net/2.0.5/js/dataTables.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-    <script>
-        let table = new DataTable('#dailysaletable');
-    </script>
 
 
 

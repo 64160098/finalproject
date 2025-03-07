@@ -1,7 +1,7 @@
 <x-appadmin-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            {{ __('เพิ่มข้อมูลโชน') }}
+            {{ __('เพิ่มข้อมูลพื้นที่จัดเก็บสินค้า') }}
         </h2>
     </x-slot>
 
@@ -12,9 +12,9 @@
                     <div class="contrainer mt-2">
                         <div class="row">
                             <div class="flex items-center gap-4">
-                                <p class="bread"><span><a href="{{ route('warehouse.zone', ['id' => $warehouse->id]) }}"
+                                <p class="bread"><span><a href="{{ route('warehouse.warehouses') }}"
                                             class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-800 hover:text-gray-700 dark:hover:text-gray-300 focus:outline-none transition ease-in-out duration-150">ย้อนกลับ</a></span>
-                                    / <span>เพิ่มข้อมูลโชน</span></p>
+                                    / <span>เพิ่มข้อมูลพื้นที่จัดเก็บสินค้า</span></p>
                             </div>
                             @if (session('status'))
                                 <div class="aleart alert-success">
@@ -93,7 +93,12 @@
                                             <!-- บรรทัดแรก -->
                                             <div class="w-1/2">
                                                 <x-input-label for="product_id" :value="__('รหัสสินค้า')" />
-                                                <select id="product_id" name="product_id" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50" style="width: 200px;"required>
+                                                <select id="product_id" name="product_id" 
+                                                class="mt-1 block w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 
+                                                    focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring focus:ring-indigo-500 
+                                                    dark:focus:ring-indigo-600 focus:ring-opacity-50 rounded-md shadow-sm" 
+                                                style="width: 200px;" 
+                                                required>
                                                     <option value="">เลือกรหัสสินค้า</option>
                                                     <!-- คุณควรดึงข้อมูลสินค้าจากฐานข้อมูลมาแสดงในรูปแบบ select option -->
                                                     @foreach($products as $product)
@@ -162,13 +167,13 @@
 
                                         <hr class="my-4 border-gray-300 dark:border-gray-700">
                                         <div>
-                                            <x-input-label for="id	" :value="__('รหัสโซน')" />
-                                            <x-text-input id="id" name="id" type="text" class="mt-1 block w-full" style="width: 200px;" required placeholder="รหัสโซน"/>
+                                            <x-input-label for="id	" :value="__('รหัสพื้นที่จัดเก็บสินค้า')" />
+                                            <x-text-input id="id" name="id" type="text" class="mt-1 block w-full" style="width: 200px;" required placeholder="รหัสพื้นที่จัดเก็บสินค้า"/>
                                         </div>
                                         <hr class="my-4 border-gray-300 dark:border-gray-700">
                                         <div>
-                                            <x-input-label for="name" :value="__('ชื่อโซน')" />
-                                            <x-text-input id="name" name="name" type="text" class="mt-1 block w-full" style="width: 200px;" required placeholder="ชื่อโซน"/>
+                                            <x-input-label for="name" :value="__('ชื่อพื้นที่จัดเก็บสินค้า')" />
+                                            <x-text-input id="name" name="name" type="text" class="mt-1 block w-full" style="width: 200px;" required placeholder="ชื่อพื้นที่จัดเก็บสินค้า"/>
                                         </div>
 
                                         <hr class="my-4 border-gray-300 dark:border-gray-700">
@@ -226,9 +231,9 @@
     <script>
         $('#submit-button').click(function(event) {
             event.preventDefault(); // Prevent default form submission
-
+    
             var formData = new FormData($('#zone-form')[0]); // Create FormData from form
-
+    
             $.ajax({
                 url: $('#zone-form').attr('action'), // Use form action URL
                 type: 'POST',
@@ -237,23 +242,24 @@
                 contentType: false,
                 success: function(response) {
                     console.log(response); // Show response in console
-                    alert('เพิ่มข้อมูลโซนเรียบร้อยแล้ว');
-                    window.location.href = "{{ route('warehouse.zone', ['id' => $warehouse->id]) }}";
+                    
+                    // แสดงข้อความสำเร็จ
+                    alert('เพิ่มข้อมูลพื้นที่จัดเก็บเรียบร้อยแล้ว');
+                    
+                    // Redirect ไปยังหน้าคลังสินค้า
+                    window.location.href = "{{ route('warehouse.warehouses') }}";
                 },
                 error: function(xhr) {
-                    console.error('Error:', xhr);
-                    if (xhr.status === 422) {
-                        var errors = xhr.responseJSON.errors;
-                        if (errors.id) {
-                            $('#id_error').show().text(errors.id[0]);
-                        }
-                    } else {
-                        alert('เกิดข้อผิดพลาดในการบันทึกข้อมูล');
+                    // กระบวนการเมื่อเกิดข้อผิดพลาด
+                    var errorMessage = 'เกิดข้อผิดพลาดในการบันทึกข้อมูล'; // ข้อความพื้นฐานที่จะแสดงให้ผู้ใช้
+                    if (xhr.status === 400 && xhr.responseJSON && xhr.responseJSON.message) {
+                        errorMessage = xhr.responseJSON.message; // ใช้ข้อความจากเซิร์ฟเวอร์หากเกิดข้อผิดพลาดแบบ 400 (ข้อมูลซ้ำ)
                     }
+                    alert(errorMessage); // แสดงข้อความผิดพลาดให้แก่ผู้ใช้
                 }
             });
         });
-    </script> 
+    </script>    
     
     <script>
         $(document).ready(function() {

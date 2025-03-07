@@ -53,7 +53,9 @@
                                     <div class="p-4 bg-white dark:bg-gray-800 shadow sm:rounded-lg flex items-center gap-4">
                                         <div>
                                             <x-input-label for="product_type_id" :value="__('ประเภท')" />
-                                            <select class="form-select" name="product_type_id">
+                                            <select name="product_type_id" class="mt-1 block w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 
+                                            focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring focus:ring-indigo-500 
+                                            dark:focus:ring-indigo-600 focus:ring-opacity-50 rounded-md shadow-sm" style="width: 200px;">
                                                 <option value="" selected>-</option>
                                                 @foreach($producttypes as $row)
                                                     <option value="{{ $row->id }}">{{ $row->product_type }}</option>
@@ -68,7 +70,9 @@
                                     <div class="p-4 bg-white dark:bg-gray-800 shadow sm:rounded-lg flex items-center gap-4">
                                         <div>
                                             <x-input-label for="product_unit_id" :value="__('หน่วยนับ')" />
-                                            <select class="form-select" name="product_unit_id">
+                                            <select name="product_unit_id" class="mt-1 block w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 
+                                            focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring focus:ring-indigo-500 
+                                            dark:focus:ring-indigo-600 focus:ring-opacity-50 rounded-md shadow-sm" style="width: 200px;">
                                                 <option value="" selected>-</option>
                                                 @foreach ($units as $row)
                                                     <option value="{{ $row->id }}">{{ $row->unit }}</option>
@@ -149,8 +153,8 @@
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     
     <script>
-        $(document).ready(function(){
-            $('#submit-button').click(function(event){
+        $(document).ready(function() {
+            $('#submit-button').click(function(event) {
                 event.preventDefault(); // ป้องกันการส่งฟอร์มไปยังเซิร์ฟเวอร์
     
                 var formData = new FormData($('form')[0]); // สร้าง FormData จากฟอร์ม
@@ -165,31 +169,41 @@
                     data: formData,
                     processData: false,
                     contentType: false,
-                    success: function(response){
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') // เพิ่ม CSRF Token
+                    },
+                    success: function(response) {
                         // กระบวนการเมื่อสำเร็จ
                         console.log(response); // แสดงผลลัพธ์ในคอนโซล
                         alert('เพิ่มข้อมูลสินค้าเรียบร้อยแล้ว');
                         // รีเฟรชหน้าหรือทำสิ่งอื่นตามต้องการ
                         window.location.href = "{{ route('product.products') }}";
                     },
-                    error: function(xhr){
+                    error: function(xhr) {
                         // กระบวนการเมื่อเกิดข้อผิดพลาด
                         console.error('Error:', xhr);
+                        
+                        // แสดงรายละเอียดข้อผิดพลาด
                         if (xhr.status === 422) {
-                            var errors = xhr.responseJSON.errors;
-                            if (errors.id) {
-                                $('#id_error').show().text(errors.id[0]);
-                            }
-                            if (errors.product_name) {
-                                $('#product_name_error').show().text(errors.product_name[0]);
-                            }
+                            var errors = xhr.responseJSON.errors; // ดึงข้อผิดพลาดจาก response JSON
+                            $.each(errors, function(key, value) {
+                                // แสดงข้อผิดพลาดในแต่ละฟิลด์
+                                var errorElement = $('#' + key + '_error');
+                                if (errorElement.length) {
+                                    errorElement.show().text(value[0]); // แสดงข้อความข้อผิดพลาด
+                                } else {
+                                    // หากไม่พบองค์ประกอบข้อผิดพลาดที่ตรงกับฟิลด์
+                                    alert('พบข้อผิดพลาด: ' + value[0]);
+                                }
+                            });
                         } else {
-                            alert('เกิดข้อผิดพลาดในการบันทึกข้อมูล');
+                            // แสดงข้อผิดพลาดที่ไม่ใช่ 422
+                            alert('เกิดข้อผิดพลาดในการบันทึกข้อมูล: ' + xhr.responseText);
                         }
                     }
                 });
             });
         });
-    </script>   
-
+    </script>
+    
 </x-appadmin-layout>

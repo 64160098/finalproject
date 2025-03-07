@@ -11,8 +11,36 @@ class InventoryController extends Controller
 {
     // Create Index
     public function index() {
-        $inventories = DB::table('inventories')->orderBy('id', 'asc')->paginate(5);
-        return view('inventory.inventories', ['inventories' => $inventories]);
+        // ตรวจสอบว่ามีคำค้นหาหรือไม่
+        $searchTerm = request('search');
+        
+        if ($searchTerm) {
+            // ใช้ Scout ในการค้นหา inventory ตามคำค้นหา
+            $inventories = Inventory::with(['product.productType', 'product.productUnit'])->where(function ($query) use ($searchTerm) {
+                // ค้นหาจากตาราง inventories ฟิลด์ amount
+                $query->where('amount', 'like', "%{$searchTerm}%")
+                      // ค้นหาจากตาราง products
+                      ->orWhereHas('product', function ($query) use ($searchTerm) {
+                          $query->where('product_id', 'like', "%{$searchTerm}%")
+                                ->orWhere('product_name', 'like', "%{$searchTerm}%")
+                                ->orWhere('product_width', 'like', "%{$searchTerm}%")
+                                ->orWhere('product_length', 'like', "%{$searchTerm}%")
+                                ->orWhere('product_height', 'like', "%{$searchTerm}%")
+                                ->orWhere('price', 'like', "%{$searchTerm}%")
+                                ->orWhereHas('productType', function($query) use ($searchTerm) {
+                                    $query->where('product_type', 'like', "%{$searchTerm}%");
+                                })
+                                ->orWhereHas('productUnit', function($query) use ($searchTerm) {
+                                    $query->where('unit', 'like', "%{$searchTerm}%");
+                                });
+                      });
+            })->paginate(5);
+        } else {
+            // ถ้าไม่มีคำค้นหา ให้ดึงข้อมูลทั้งหมดแบบปกติ
+            $inventories = Inventory::with('product')->paginate(5);
+        }
+
+        return view('inventory.inventories', compact('inventories'));
     }
 
     // Create resource
@@ -34,25 +62,5 @@ class InventoryController extends Controller
     
         return redirect()->route('inventory.inventories')->with('success', 'Inventory updated successfully');
     }
-    
-    public function showInventoryForm() {
-        // ตรวจสอบว่ามีคำค้นหาหรือไม่
-        $searchTerm = request('search');
-        
-        // ดึงข้อมูลสินค้าพร้อมกับข้อมูลสินค้าในคลัง
-        if ($searchTerm) {
-            // ใช้ Scout ในการค้นหา
-            $products = Product::search($searchTerm)->paginate(5);
-        } else {
-            // ถ้าไม่มีคำค้นหา ให้ดึงข้อมูลสินค้าทั้งหมด
-            $products = Product::with('inventory')->paginate(5);
-        }
-    
-        // ดึงข้อมูลสินค้าในคลังทั้งหมดแบบ paginate
-        $inventories = DB::table('inventories')->orderBy('id', 'asc')->paginate(5);
-    
-        return view('inventory.inventories', compact('products', 'inventories'));
-    }
-    
 
 }

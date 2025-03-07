@@ -7,19 +7,19 @@
 
 <style>
 .custom-blue-box {
-    background-color: #E0FFFF; /* เปลี่ยนเป็นสีเขียวตามต้องการ */
+    background-color: #067ca0; /* เปลี่ยนเป็นสีเขียวตามต้องการ */
     padding: 10px;
     border-radius: 8px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }  
 .custom-green-box {
-    background-color: #7FFFD4; /* เปลี่ยนเป็นสีเขียวตามต้องการ */
+    background-color: #64ad0491; /* เปลี่ยนเป็นสีเขียวตามต้องการ */
     padding: 10px;
     border-radius: 8px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }  
 .custom-yellow-box {
-    background-color: #FFFFE0; /* เปลี่ยนเป็นสีเขียวตามต้องการ */
+    background-color: #aaaa44; /* เปลี่ยนเป็นสีเขียวตามต้องการ */
     padding: 10px;
     border-radius: 8px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);

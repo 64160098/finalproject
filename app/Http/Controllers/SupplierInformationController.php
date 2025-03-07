@@ -15,7 +15,13 @@ class SupplierInformationController extends Controller
     
         if ($searchTerm) {
             // ใช้ Scout ในการค้นหา
-            $suppliers = SupplierInformation::search($searchTerm)->paginate(5);
+            $suppliers = SupplierInformation::where('id', 'like', "%{$searchTerm}%")
+                ->orWhere('supplier_name', 'like', "%{$searchTerm}%")
+                ->orWhere('supplier_customer_name', 'like', "%{$searchTerm}%")
+                ->orWhere('supplier_product', 'like', "%{$searchTerm}%")
+                ->orWhere('supplier_contact_number', 'like', "%{$searchTerm}%")
+                ->orWhere('supplier_email', 'like', "%{$searchTerm}%")
+                ->paginate(5);
         } else {
             // ถ้าไม่มีคำค้นหา ให้ดึงข้อมูลทั้งหมดแบบปกติ
             $suppliers = SupplierInformation::orderBy('id', 'asc')->paginate(5);
@@ -32,19 +38,21 @@ class SupplierInformationController extends Controller
     //Store resource
     public function store(Request $request) {
         $request->validate([
-            'company_name' => 'required',
-            'customer_name' => 'required',
-            'about_product' => 'required',
-            'contact_number' => 'required|max:10',
-            'email' => 'required'
+            'id' => 'required',
+            'supplier_name' => 'required',
+            'supplier_customer_name' => 'required',
+            'supplier_product' => 'required',
+            'supplier_contact_number' => 'required|max:10',
+            'supplier_email' => 'required'
         ]);
               
         $supplier = new SupplierInformation;
-        $supplier->company_name = $request->company_name;
-        $supplier->customer_name = $request->customer_name;
-        $supplier->about_product = $request->about_product;
-        $supplier->contact_number = $request->contact_number;
-        $supplier->email = $request->email;
+        $supplier->id = $request->id;
+        $supplier->supplier_name = $request->supplier_name;
+        $supplier->supplier_customer_name = $request->supplier_customer_name;
+        $supplier->supplier_product = $request->supplier_product;
+        $supplier->supplier_contact_number = $request->supplier_contact_number;
+        $supplier->supplier_email = $request->supplier_email;
         $supplier->save();
         
         return redirect()->route('supplier.suppliers')->with('success', 'เพิ่มข้อมูลผู้จัดจำหน่ายเรียบร้อยแล้ว');
@@ -56,19 +64,21 @@ class SupplierInformationController extends Controller
 
     public function update(Request $request, $id) {
         $request->validate([
-            'company_name' => 'required',
-            'customer_name' => 'required',
-            'about_product' => 'required',
-            'contact_number' => 'required|max:10',
-            'email' => 'required'
+            'id' => 'required',
+            'supplier_name' => 'required',
+            'supplier_customer_name' => 'required',
+            'supplier_product' => 'required',
+            'supplier_contact_number' => 'required|max:10',
+            'supplier_email' => 'required'
         ]);
     
         $supplier = SupplierInformation::find($id);
-        $supplier->company_name = $request->company_name;
-        $supplier->customer_name = $request->customer_name;
-        $supplier->about_product = $request->about_product;
-        $supplier->contact_number = $request->contact_number;
-        $supplier->email = $request->email;
+        $supplier->id = $request->id;
+        $supplier->supplier_name = $request->supplier_name;
+        $supplier->supplier_customer_name = $request->supplier_customer_name;
+        $supplier->supplier_product = $request->supplier_product;
+        $supplier->supplier_contact_number = $request->supplier_contact_number;
+        $supplier->supplier_email = $request->supplier_email;
         $supplier->save();
         return redirect()->route('supplier.suppliers')->with('success', 'แก้ไขข้อมูลผู้จัดจำหน่ายเรียบร้อยแล้ว');
     }    

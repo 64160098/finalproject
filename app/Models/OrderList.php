@@ -12,9 +12,9 @@ class OrderList extends Model
     use HasFactory;
     use Searchable;
 
-    protected $fillable = [
-        'code', 'product_name', 'quantity_products_order', 'unit', 'cost_unit', 'total', 'created_at'
-    ];
+    public function product() {
+        return $this->belongsTo(Product::class, 'product_id', 'id');
+    }
 
     public function toSearchableArray()
     {

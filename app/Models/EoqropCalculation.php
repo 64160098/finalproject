@@ -22,4 +22,17 @@ class EoqropCalculation extends Model
         'eoq',
         'rop',
     ];
+
+    public function product() {
+        return $this->belongsTo(Product::class, 'product_id', 'id');
+    }
+
+    public function zone() {
+        return $this->belongsTo(Zone::class);
+    }
+
+    public function warehouse() {
+        return $this->belongsTo(Warehouse::class);
+    }  
+    
 }

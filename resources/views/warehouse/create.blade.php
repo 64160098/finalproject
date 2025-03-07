@@ -160,6 +160,7 @@
                                             @error('status')
                                                 <div class="aleart alert-success">{{ $message }}</div>
                                             @enderror
+                                            <p class="text-sm text-red-600">*สถานะที่กรอกมีดังนี้ Active, Inactive, Under Maintenance</p>
                                         </div>
 
                                     <div class="items-center gap-4">
@@ -202,16 +203,15 @@
                         window.location.href = "{{ route('warehouse.warehouses') }}";
                     },
                     error: function(xhr){
-                        // กระบวนการเมื่อเกิดข้อผิดพลาด
-                        console.error('Error:', xhr);
-                        if (xhr.status === 422) {
-                            var errors = xhr.responseJSON.errors;
-                            if (errors.id) {
-                                $('#id_error').show().text(errors.id[0]);
-                            }
-                        } else {
-                            alert('เกิดข้อผิดพลาดในการบันทึกข้อมูล');
+                        // ตรวจสอบและแสดงข้อความข้อผิดพลาดจากเซิร์ฟเวอร์
+                        var errorMsg = 'เกิดข้อผิดพลาดในการลบข้อมูล';
+                        if (xhr.responseJSON && xhr.responseJSON.message) {
+                            errorMsg = xhr.responseJSON.message;
+                        } else if (xhr.responseText) {
+                            errorMsg = xhr.responseText;
                         }
+                        console.error('Error:', xhr);
+                        alert(errorMsg);
                     }
                 });
             });

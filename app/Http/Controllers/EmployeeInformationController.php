@@ -15,7 +15,13 @@ class EmployeeInformationController extends Controller
     
         if ($searchTerm) {
             // ใช้ Scout ในการค้นหา
-            $employees = EmployeeInformation::search($searchTerm)->paginate(5);
+            $employees = EmployeeInformation::where('id', 'like', "%{$searchTerm}%")
+                ->orWhere('employee_firstname', 'like', "%{$searchTerm}%")
+                ->orWhere('employee_lastname', 'like', "%{$searchTerm}%")
+                ->orWhere('employee_contact_number', 'like', "%{$searchTerm}%")
+                ->orWhere('employee_email', 'like', "%{$searchTerm}%")
+                ->orWhere('employee_status', 'like', "%{$searchTerm}%")
+                ->paginate(5);
         } else {
             // ถ้าไม่มีคำค้นหา ให้ดึงข้อมูลทั้งหมดแบบปกติ
             $employees = EmployeeInformation::orderBy('id', 'asc')->paginate(5);
@@ -32,37 +38,37 @@ class EmployeeInformationController extends Controller
     //Store resource
     public function store(Request $request) {
 
-        $existingEmployee = EmployeeInformation::where('employee_id', $request->employee_id)
+        $existingEmployee = EmployeeInformation::where('id', $request->id)
         ->first();
         
         if ($existingEmployee) {
-            if ($existingEmployee->employee_id === $request->employee_id) {
+            if ($existingEmployee->id === $request->id) {
                 if ($request->ajax()) {
-                    return response()->json(['errors' => ['employee_id' => ['รหัสพนักงานนี้ถูกใช้ไปแล้ว']]], 422);
+                    return response()->json(['errors' => ['id' => ['รหัสพนักงานนี้ถูกใช้ไปแล้ว']]], 422);
                 }
-                return back()->withErrors(['employee_id' => 'รหัสพนักงานนี้ถูกใช้ไปแล้ว']);
+                return back()->withErrors(['id' => 'รหัสพนักงานนี้ถูกใช้ไปแล้ว']);
             }
         } 
     
         // ตรวจสอบความถูกต้องของข้อมูลที่ส่งมา
         $validatedData = $request->validate([
-            'employee_id' => 'required',
-            'firstname' => 'required',
-            'lastname' => 'required',
-            'contact_number' => 'required|max:10',
-            'email' => 'required',
-            'status' => 'required',
+            'id' => 'required',
+            'employee_firstname' => 'required',
+            'employee_lastname' => 'required',
+            'employee_contact_number' => 'required|max:10',
+            'employee_email' => 'required',
+            'employee_status' => 'required',
         ]);
     
         
         // บันทึกข้อมูลพนักงานใหม่
         $employee = new EmployeeInformation;
-        $employee->employee_id = $request->employee_id;
-        $employee->firstname = $request->firstname;
-        $employee->lastname = $request->lastname;
-        $employee->contact_number = $request->contact_number;
-        $employee->email = $request->email;
-        $employee->status = $request->status;
+        $employee->id = $request->id;
+        $employee->employee_firstname = $request->employee_firstname;
+        $employee->employee_lastname = $request->employee_lastname;
+        $employee->employee_contact_number = $request->employee_contact_number;
+        $employee->employee_email = $request->employee_email;
+        $employee->employee_status = $request->employee_status;
         $employee->save();
 
         if ($request->ajax()) {
@@ -78,18 +84,18 @@ class EmployeeInformationController extends Controller
 
     public function update(Request $request, $id) {
         $request->validate([
-            'employee_id' => 'required',
-            'firstname' => 'required',
-            'lastname' => 'required',
-            'contact_number' => 'required|max:10',
-            'email' => 'required',
-            'status' => 'required',
+            'id' => 'required',
+            'employee_firstname' => 'required',
+            'employee_lastname' => 'required',
+            'employee_contact_number' => 'required|max:10',
+            'employee_email' => 'required',
+            'employee_status' => 'required',
         ]);
 
                 // ตรวจสอบว่ามีข้อมูลที่มีรหัสหรือชื่อซ้ำกับข้อมูลที่ไม่ใช่ตัวเองหรือไม่
                 $existingEmployeeInformation = EmployeeInformation::where('id', '!=', $id) // ไม่รวมตัวเองที่กำลังอัปเดต
                 ->where(function($query) use ($request) {
-                    $query->where('employee_id', $request->employee_id);
+                    $query->where('id', $request->id);
                 })
                 ->first();
         
@@ -97,19 +103,19 @@ class EmployeeInformationController extends Controller
                 // ตรวจสอบว่ารหัสประเภทสินค้าซ้ำหรือไม่
                 if ($existingEmployeeInformation->employee_id === $request->employee_id) {
                     if ($request->ajax()) {
-                        return response()->json(['errors' => ['employee_id' => ['รหัสพนักงานนี้ถูกใช้ไปแล้ว']]], 422);
+                        return response()->json(['errors' => ['id' => ['รหัสพนักงานนี้ถูกใช้ไปแล้ว']]], 422);
                     }
-                    return back()->withErrors(['employee_id' => 'รหัสพนักงานนี้ถูกใช้ไปแล้ว']);
+                    return back()->withErrors(['id' => 'รหัสพนักงานนี้ถูกใช้ไปแล้ว']);
                 } 
             } 
     
         $employee = EmployeeInformation::find($id);
-        $employee->employee_id = $request->employee_id;
-        $employee->firstname = $request->firstname;
-        $employee->lastname = $request->lastname;
-        $employee->contact_number = $request->contact_number;
-        $employee->email = $request->email;
-        $employee->status = $request->status;
+        $employee->id = $request->id;
+        $employee->employee_firstname = $request->employee_firstname;
+        $employee->employee_lastname = $request->employee_lastname;
+        $employee->employee_contact_number = $request->employee_contact_number;
+        $employee->employee_email = $request->employee_email;
+        $employee->employee_status = $request->employee_status;
         $employee->save();
 
         if ($request->ajax()) {

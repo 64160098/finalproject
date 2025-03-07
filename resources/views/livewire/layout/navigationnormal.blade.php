@@ -30,8 +30,8 @@ $logout = function (Logout $logout) {
                 <!-- Logo -->
                 <div class="shrink-0 flex items-center">
                     <a href="{{ route('dashboard') }}" wire:navigate>
-                        <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" class="large-text">
-                            {{ __('ระบบการจัดการสินค้า') }}
+                        <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" class="large-text text-gray-900 dark:text-gray-100">
+                            {{ __('ระบบบริหารสินค้าคงคลัง') }}
                         </text>
                     </a>
                 </div>
@@ -63,15 +63,11 @@ $logout = function (Logout $logout) {
                             </x-dropdown-link>
 
                             <x-dropdown-link :href="route('dailysale.dailysales')" wire:navigate>
-                                {{ __('รายงานยอดขายรายวัน') }}
+                                {{ __('รายงานยอดขาย') }}
                             </x-dropdown-link>
 
                             <x-dropdown-link :href="route('inventoryreport.inventoryreports')" wire:navigate>
                                 {{ __('รายงานสินค้าคงเหลือ') }}
-                            </x-dropdown-link>
-
-                            <x-dropdown-link :href="route('orderproduct.orderproducts')" wire:navigate>
-                                {{ __('สินค้าที่ต้องสั่งเพิ่มเติม') }}
                             </x-dropdown-link>
                         </x-slot>
                     </x-dropdown>

@@ -30,8 +30,8 @@ $logout = function (Logout $logout) {
                 <!-- Logo -->
                 <div class="shrink-0 flex items-center">
                     <a href="{{ route('dashboard') }}" wire:navigate>
-                        <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" class="large-text">
-                            {{ __('ระบบการจัดการสินค้า') }}
+                        <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" class="large-text text-gray-900 dark:text-gray-100">
+                            {{ __('ระบบบริหารสินค้าคงคลัง') }}
                         </text>
                     </a>
                 </div>

@@ -1,5 +1,5 @@
-<text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" class="large-text" {{ $attributes }}>
-        {{ __('ระบบการจัดการสินค้า') }}
+<text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" class="large-text text-gray-900 dark:text-gray-100" {{ $attributes }}>
+        {{ __('ระบบบริหารสินค้าคงคลัง') }}
 </text>
 
 <style>

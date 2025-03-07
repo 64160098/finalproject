@@ -10,13 +10,12 @@ class Inventory extends Model
     use HasFactory;
 
     protected $fillable = [
-        'code',
-        'product_name',
-        'amount'
+        'product_id',
+        'amount',
     ];
 
     public function product() {
-        return $this->hasMany(Product::class, 'code', 'id');
+        return $this->belongsTo(Product::class, 'product_id', 'id');  // แก้ไขให้ใช้ belongsTo และเชื่อมโยงกับ product_id
     }
 
     public function receiveproduct() {

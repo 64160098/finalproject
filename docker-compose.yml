@@ -1,0 +1,52 @@
+services:
+ web:
+   build: .
+   ports:
+     - "${DOCKER_PORT:-8000}:80"
+   volumes:
+     - .:/var/www/html
+     - ./php.ini:/usr/local/etc/php/conf.d/custom.ini
+   environment:
+     DB_HOST: db
+     DB_PORT: 3306
+     DB_DATABASE: projectdb
+     DB_USERNAME: root
+     DB_PASSWORD: 0000
+   depends_on:
+     - db
+   networks:
+     - app-network
+
+ db:
+   image: mysql:8.0
+   restart: always 
+   environment:
+      MYSQL_DATABASE: projectdb
+      MYSQL_ROOT_PASSWORD: 0000
+      MYSQL_USER: laravel
+      MYSQL_PASSWORD: password
+   ports:
+     - "${DB_PORT:-3306}:3306"
+   volumes:
+     - dbdata:/var/lib/mysql
+   networks:
+     - app-network
+
+ phpmyadmin:
+   image: phpmyadmin/phpmyadmin
+   environment:
+     PMA_HOST: db
+     MYSQL_ROOT_PASSWORD: 0000
+   ports:
+     - "${PMA_PORT:-8080}:80"
+   depends_on:
+     - db
+   networks:
+     - app-network
+
+networks:
+ app-network:
+   driver: bridge
+
+volumes:
+ dbdata:

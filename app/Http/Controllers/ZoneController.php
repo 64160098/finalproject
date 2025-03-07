@@ -10,22 +10,6 @@ use Illuminate\Support\Facades\DB;
 
 class ZoneController extends Controller
 {
-    // Create Index
-    public function index() {
-            // ตรวจสอบว่ามีคำค้นหาหรือไม่
-        $searchTerm = request('search');
-    
-        if ($searchTerm) {
-            // ใช้ Scout ในการค้นหา
-            $zones = Zone::search($searchTerm)->paginate(5);
-        } else {
-            // ถ้าไม่มีคำค้นหา ให้ดึงข้อมูลทั้งหมดแบบปกติ
-            $zones = Zone::orderBy('id', 'asc')->paginate(5);
-        }
-
-        return view('warehouse.zone', ['zones' => $zones]);
-    }
-
     public function create($warehouseId) {
         // ดึงข้อมูลคลังสินค้า
         $warehouse = Warehouse::findOrFail($warehouseId);
@@ -51,10 +35,20 @@ class ZoneController extends Controller
             'zone_height' => 'required|numeric',
             'zone_status' => 'required',
         ]);
-    
+
+        // ตรวจสอบว่าสินค้าตัวนี้มีโซนในคลังสินค้านี้แล้วหรือยัง
+        $existingZone = Zone::where('product_id', $validated['product_id'])
+                            ->where('warehouse_id', $validated['warehouse_id'])
+                            ->first();
+
+        if ($existingZone) {
+            // ถ้ามีโซนที่ตรงกับ product_id และ warehouse_id อยู่แล้ว
+            return response()->json(['message' => 'สินค้าตัวนี้มีพื้นที่จัดเก็บในคลังสินค้านี้แล้ว ไม่สามารถเพิ่มซ้ำได้'], 400);
+        }
+
         // Calculate volume
         $zone_volume = $validated['zone_width'] * $validated['zone_length'] * $validated['zone_height'];
-    
+
         // Create a new zone
         $zone = new Zone;
         $zone->id = $validated['id'];
@@ -67,10 +61,11 @@ class ZoneController extends Controller
         $zone->zone_volume = $zone_volume;
         $zone->zone_status = $validated['zone_status'];
         $zone->save();
-    
+
         // Redirect with success message
         return redirect()->route('warehouse.zone', ['id' => $validated['warehouse_id']])->with('success', 'เพิ่มข้อมูลโซนเรียบร้อยแล้ว');
     }
+
 
     public function edit($zoneId) {
         // ดึงข้อมูลโซนจาก ID ที่ระบุ
@@ -132,7 +127,7 @@ class ZoneController extends Controller
     
     public function destroy($warehouseId, Zone $zone) {
         $zone->delete();
-        return response()->json(['success' => 'ข้อมูลสินค้าถูกลบเรียบร้อยแล้ว'], 200);
+        return response()->json(['success' => 'ข้อมูลพื้นที่จัดเก็บสินค้าถูกลบเรียบร้อยแล้ว'], 200);
     }
 
     public function getProductDetailsByZone($id) {

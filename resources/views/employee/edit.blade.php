@@ -28,67 +28,67 @@
                                 <div class="space-y-6">
                                     <div class="p-4 bg-white dark:bg-gray-800 shadow sm:rounded-lg flex items-center gap-4">
                                         <div>
-                                            <x-input-label for="employee_id" :value="__('รหัสพนักงาน')" />
-                                            <x-text-input wire:model="employee_id" id="employee_id"
-                                                name="employee_id" value="{{ $employee->employee_id }}" type="text" class="mt-1 block w-full"
-                                                required autofocus autocomplete="employee_id" placeholder="รหัสพนักงาน"/>
-                                                <div class="alert alert-danger" id="employee_id_error"></div>
-                                            @error('employee_id')
+                                            <x-input-label for="id" :value="__('รหัสพนักงาน')" />
+                                            <x-text-input wire:model="id" id="id"
+                                                name="id" value="{{ $employee->id }}" type="text" class="mt-1 block w-full"
+                                                required autofocus autocomplete="id" placeholder="รหัสพนักงาน"/>
+                                                <div class="alert alert-danger" id="id_error"></div>
+                                            @error('id')
                                                 <div class="aleart alert-success">{{ $message }}</div>
                                             @enderror
                                         </div>
                                     </div>
                                     <div class="p-4 bg-white dark:bg-gray-800 shadow sm:rounded-lg flex items-center gap-4">
                                         <div>
-                                            <x-input-label for="firstname" :value="__('ชื่อจริง')" />
-                                            <x-text-input wire:model="firstname" id="firstname"
-                                                name="firstname" value="{{ $employee->firstname }}" type="text" class="mt-1 block w-full"
-                                                required autofocus autocomplete="firstname" placeholder="ชื่อจริง"/>
-                                            @error('firstname')
+                                            <x-input-label for="employee_firstname" :value="__('ชื่อจริง')" />
+                                            <x-text-input wire:model="employee_firstname" id="employee_firstname"
+                                                name="employee_firstname" value="{{ $employee->employee_firstname }}" type="text" class="mt-1 block w-full"
+                                                required autofocus autocomplete="employee_firstname" placeholder="ชื่อจริง"/>
+                                            @error('employee_firstname')
                                                 <div class="aleart alert-success">{{ $message }}</div>
                                             @enderror
                                         </div>
                                     </div>
                                     <div class="p-4 bg-white dark:bg-gray-800 shadow sm:rounded-lg flex items-center gap-4">
                                         <div>
-                                            <x-input-label for="lastname" :value="__('นามสกุล')" />
-                                            <x-text-input wire:model="lastname" id="lastname"
-                                                name="lastname" value="{{ $employee->lastname }}" type="text" class="mt-1 block w-full"
-                                                required autofocus autocomplete="lastname" placeholder="นามสกุล"/>
-                                            @error('lastname')
+                                            <x-input-label for="employee_lastname" :value="__('นามสกุล')" />
+                                            <x-text-input wire:model="employee_lastname" id="employee_lastname"
+                                                name="employee_lastname" value="{{ $employee->employee_lastname }}" type="text" class="mt-1 block w-full"
+                                                required autofocus autocomplete="employee_lastname" placeholder="นามสกุล"/>
+                                            @error('employee_lastname')
                                                 <div class="aleart alert-success">{{ $message }}</div>
                                             @enderror
                                         </div>
                                     </div>
                                     <div class="p-4 bg-white dark:bg-gray-800 shadow sm:rounded-lg flex items-center gap-4">
                                         <div>
-                                            <x-input-label for="contact_number" :value="__('เบอร์ติดต่อ')" />
-                                            <x-text-input wire:model="contact_number" id="contact_number"
-                                                name="contact_number" value="{{ $employee->contact_number }}" type="text" class="mt-1 block w-full"
-                                                required autofocus autocomplete="contact_number" placeholder="เบอร์ติดต่อ"/>
-                                            @error('contact_number')
+                                            <x-input-label for="employee_contact_number" :value="__('เบอร์ติดต่อ')" />
+                                            <x-text-input wire:model="employee_contact_number" id="employee_contact_number"
+                                                name="employee_contact_number" value="{{ $employee->employee_contact_number }}" type="text" class="mt-1 block w-full"
+                                                required autofocus autocomplete="employee_contact_number" placeholder="เบอร์ติดต่อ"/>
+                                            @error('employee_contact_number')
                                                 <div class="aleart alert-success">{{ $message }}</div>
                                             @enderror
                                         </div>
                                     </div>
                                     <div class="p-4 bg-white dark:bg-gray-800 shadow sm:rounded-lg flex items-center gap-4">
                                         <div>
-                                            <x-input-label for="email" :value="__('อีเมลล์')" />
-                                            <x-text-input wire:model="email" id="email"
-                                                name="email" value="{{ $employee->email }}" type="email" class="mt-1 block w-full"
-                                                required autofocus autocomplete="email" placeholder="อีเมลล์"/>
-                                            @error('email')
+                                            <x-input-label for="employee_email" :value="__('อีเมลล์')" />
+                                            <x-text-input wire:model="employee_email" id="employee_email"
+                                                name="employee_email" value="{{ $employee->employee_email }}" type="email" class="mt-1 block w-full"
+                                                required autofocus autocomplete="employee_email" placeholder="อีเมลล์"/>
+                                            @error('employee_email')
                                                 <div class="aleart alert-success">{{ $message }}</div>
                                             @enderror
                                         </div>
                                     </div>
                                     <div class="p-4 bg-white dark:bg-gray-800 shadow sm:rounded-lg flex items-center gap-4">
                                         <div>
-                                            <x-input-label for="status" :value="__('สถานะ')" />
-                                            <x-text-input wire:model="status" id="status"
-                                                name="status" value="{{ $employee->status }}" type="text" class="mt-1 block w-full"
-                                                required autofocus autocomplete="status" placeholder="สถานะ"/>
-                                            @error('status')
+                                            <x-input-label for="employee_status" :value="__('สถานะ')" />
+                                            <x-text-input wire:model="employee_status" id="employee_status"
+                                                name="employee_status" value="{{ $employee->employee_status }}" type="text" class="mt-1 block w-full"
+                                                required autofocus autocomplete="employee_status" placeholder="สถานะ"/>
+                                            @error('employee_status')
                                                 <div class="aleart alert-success">{{ $message }}</div>
                                             @enderror
                                         </div>

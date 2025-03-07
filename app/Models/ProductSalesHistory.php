@@ -12,15 +12,6 @@ class ProductSalesHistory extends Model
     use HasFactory;
     use Searchable;
 
-    protected $fillable = [
-        'code',
-        'product_name',
-        'quantity_products_sale',
-        'unit',
-        'cost_unit',
-        'total',
-        'created_at'
-    ];
 
     public function toSearchableArray()
     {
@@ -29,5 +20,19 @@ class ProductSalesHistory extends Model
             'product_name' => $this->product_name,
             'created_at' => $this->created_at ? Carbon::parse($this->created_at)->translatedFormat('d M Y') : null,
         ];
+    }
+
+    public function product() {
+        return $this->hasMany(Product::class, 'product_id', 'id');
+    }
+
+    public function supplier()
+    {
+        return $this->belongsTo(SupplierInformation::class, 'supplier_id');
+    }
+
+    public function employee()
+    {
+        return $this->belongsTo(EmployeeInformation::class, 'employee_id');
     }
 }

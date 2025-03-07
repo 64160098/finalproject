@@ -33,7 +33,7 @@
                             <p>สมการของ ROP คือ:</p>
 
                                 <!-- Display ROP equation -->
-                                <p>$$ROP = D \times L$$</p>
+                                <p>$$ROP = D \times L + SS$$</p>
 
                             <p>โดยที่:</p>
                             <br>
@@ -42,6 +42,8 @@
                             <p><strong>𝐷</strong> คืออัตราการใช้งานต่อวัน (Daily Usage Rate)</p>
                             <br>
                             <p><strong>𝐿</strong> คือระยะเวลาในการสั่งซื้อและได้รับสินค้าสำเร็จ (Lead Time in Days)</p>
+                            <br>
+                            <p><strong>S</strong> คือปริมาณสินค้าสำรอง (Safety Stock)</p>
                             <br>
                             <hr class="my-4 border-gray-300 dark:border-gray-700">
                             <h3 class="text-xl mb-4 mt-6"><strong>วิธีการหาค่า D (Daily Usage Rate)</strong></h3>
@@ -65,16 +67,102 @@
                             <p><strong>ตัวอย่างการคำนวณ:</strong></p><br><p>หาก Lead Time คือ 10 วัน (ข้อมูลจากซัพพลายเออร์หรือประสบการณ์ที่ผ่านมา):</p>
                             <br>
                             <hr class="my-4 border-gray-300 dark:border-gray-700">
+                            <h3 class="text-xl mb-4 mt-6"><strong>วิธีการหาค่า SS (Safety Stock)</strong></h3>
+                            <p>ปริมาณสินค้าสำรอง คือ ปริมาณสินค้าที่เก็บสำรองไว้ในสต็อกเพิ่มเติมจากความต้องการปกติ เพื่อรองรับความไม่แน่นอนต่าง ๆ ที่อาจเกิดขึ้น เช่น ความผันผวนของอุปสงค์ ระยะเวลารอคอยสินค้าที่นานกว่าปกติ หรือปัญหาอื่น ๆ ที่อาจทำให้สินค้าหมดก่อนที่จะได้รับการจัดส่งครั้งใหม่</p>
+                            <br>
+                            <p><strong>ตัวอย่างการคำนวณ:</strong></p><br><p>สมการ Safety Stock คือ:</p>
+                            <br>
+                            <p>$$SS = Z \times \sigma_d \times \sqrt{L}$$</p>
+                            <br>
+                            <p>โดยที่:</p>
+                            <br>
+                            <p><strong>SS</strong> คือสินค้าสำรอง</p>
+                            <br>
+                            <p><strong>Z</strong> คือค่า Z-score ซึ่งขึ้นอยู่กับระดับความต้องการบริการ (Service Level)</p>
+                            <br>
+                            <p><strong>***การหาค่า Z-score</strong> ค่า Z-score สามารถหาได้จาก ตาราง Z (Z-table) ซึ่งเป็นตารางที่ใช้ในสถิติเพื่อหาโอกาสในกรณีที่การกระจายตัวของข้อมูลเป็นการแจกแจงปกติ โดยที่ระดับการให้บริการ (Service Level) ที่ต้องการจะกำหนดว่าค่า Z จะเป็นเท่าไหร่</p>
+                            <br>
+                            <p><strong>ตัวอย่างค่า Z-score ที่นิยมใช้</strong></p>
+                            <br>
+                            <p>Service Level 90% → Z ≈ 1.28</p>
+                            <p>Service Level 95% → Z ≈ 1.65</p>
+                            <p>Service Level 99% → Z ≈ 2.33</p>
+                            <br>
+                            <p><strong>σd</strong> คือส่วนเบี่ยงเบนมาตรฐานของความต้องการ (Standard deviation of demand)</p>
+                            <br>
+                            <p><strong>***การหาค่าส่วนเบี่ยงเบนมาตรฐาน (σd)</strong></p>
+                            <br>
+                            <p><p>$$\sigma_d = \sqrt{\frac{\sum (X - \text{Average Demand})^2}{n}}$$</p></p>
+                            <br>
+                            <p><strong>ตัวอย่างการคำนวณ</strong></p>
+                            <br>
+                            <p><strong>1. ข้อมูลความต้องการสินค้าใน 5 วัน</strong></p>
+                            <br>
+                            <p>วัน 1: 50 หน่วย</p>
+                            <br>
+                            <p>วัน 2: 55 หน่วย</p>
+                            <br>
+                            <p>วัน 3: 45 หน่วย</p>
+                            <br>
+                            <p>วัน 4: 60 หน่วย</p>
+                            <br>
+                            <p>วัน 5: 50 หน่วย</p>
+                            <br>
+                            <br>
+                            <p><strong>2. คำนวณค่าเฉลี่ย (Average Demand)</strong></p>
+                            <br>
+                            <p>$$\text{Average Demand} = \frac{50 + 55 + 45 + 60 + 50}{5} = \frac{260}{5} = 52 \text{ หน่วย}$$</p>
+                            <br>
+                            <p><strong>3. คำนวณผลต่างจากค่าเฉลี่ย (Deviation)</strong></p>
+                            <br>
+                            <p>วัน 1: 50 - 52 = -2</p>
+                            <br>
+                            <p>วัน 2: 55 - 52 = 3</p>
+                            <br>
+                            <p>วัน 3: 45 - 52 = -7</p>
+                            <br>
+                            <p>วัน 4: 60 - 52 = 8</p>
+                            <br>
+                            <p>วัน 5: 50 - 52 = -2</p>
+                            <br>
+                            <p><strong>4. ยกกำลังสองของผลต่าง</strong></p>
+                            <br>
+                            <p>วัน 1: (-2)<sup>2</sup> = 4</p>
+                            <br>
+                            <p>วัน 2: 3<sup>2</sup> = 9</p>
+                            <br>
+                            <p>วัน 3: (-7)<sup>2</sup> = 49</p>
+                            <br>
+                            <p>วัน 4: 8<sup>2</sup> = 64</p>
+                            <br>
+                            <p>วัน 5: (-2)<sup>2</sup> = 4</p>
+                            <br>
+                            <p><strong>5. หาค่าเฉลี่ยของผลต่างยกกำลังสอง (Variance)</strong></p>
+                            <br>
+                            <p>$$\text{Variance} = \frac{4 + 9 + 49 + 64 + 4}{5} = \frac{130}{5} = 26$$</p>
+                            <br>
+                            <p><strong>6. หาค่ารากที่สองของค่าเฉลี่ย (Standard Deviation)</strong></p>
+                            <br>
+                            <p>$$\sigma_d = 26 \approx 5.10$$</p>
+                            <br>
+                            <p><strong>L</strong> คือระยะเวลาในการจัดส่ง (Lead Time)</p>
+                            <br>
+                            <p><strong>ตัวอย่างการคำนวณสินค้าสำรอง</strong></p>
+                            <br>
+                            <p>$$SS = 1.28 \times 5.10 \times \sqrt{2} \approx 1.28 \times 5.10 \times 1.414 \approx 8.98$$</p>
+                            <br>
+                            <p><strong>ดังนั้น</strong> สินค้าสำรอง (Safety Stock, SS) ที่คำนวณได้ในกรณีนี้คือประมาณ 8.98 หน่วย</p>
+                            <br>
+                            <hr class="my-4 border-gray-300 dark:border-gray-700">
                             <h3 class="text-xl mb-4 mt-6"><strong>ตัวอย่างการคำนวณ ROP</strong></h3>
-                            <p>$$ROP = D \times L$$</p>
-                            <p>ใช้ข้อมูลจากข้างต้น:</p><br><p>Daily Usage Rate (𝐷) = 33 หน่วย</p><br><p>Lead Time (𝐿) = 10 วัน</p>
-                            <p>$$ROP = 33 \times 10$$</p>
+                            <p>$$ROP = D \times L + SS$$</p>
+                            <p>ใช้ข้อมูลจากข้างต้น:</p><br><p>Daily Usage Rate (𝐷) = 33 หน่วย</p><br><p>Lead Time (𝐿) = 10 วัน</p><br><p>Safety Stock (SS) = 8.98 หน่วย</p>
+                            <p>$$ROP = 33 \times 10 + 8.98$$</p>
 
-                            <p>$$ROP = 330$$</p>
+                            <p>$$ROP = 338.98$$</p>
 
-                            <p>ดังนั้น: คุณควรสั่งซื้อสินค้าใหม่เมื่อสต็อกสินค้าถึง 330 หน่วย</p>
-
-                            
+                            <p>ดังนั้น: คุณควรสั่งซื้อสินค้าใหม่เมื่อสต็อกสินค้าถึง 338.98 หน่วย</p>
+                           
                         </div>
                     </div>
                 </div>

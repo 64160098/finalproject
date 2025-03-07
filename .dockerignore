@@ -1,0 +1,51 @@
+Laravel specific
+/vendor
+.env
+.env.*
+.phpunit.result.cache
+Homestead.json
+Homestead.yaml
+
+IDE/Editor
+/.idea
+/.vscode
+*.sublime-project
+.sublime-workspace
+
+OS generated
+.DS_Store
+Thumbs.db
+
+Build/Deploy
+/node_modules
+/public/hot
+/public/storage
+/storage/.key
+/public/build
+/storage/framework/cache/*
+/storage/framework/sessions/*
+/storage/framework/views/*
+/storage/logs/*
+
+Docker
+Dockerfile*
+docker-compose*
+.docker
+
+Version control
+.git
+.gitattributes
+.gitignore
+
+Documentation
+*.md
+LICENSE
+
+Testing
+/tests
+phpunit.xml
+.phpunit.result.cache
+
+Cache and logs
+*.log
+.php_cs.cache

@@ -24,7 +24,12 @@ class DailySale extends Model
     {
         return [
             'sale_date' => $this->sale_date ? Carbon::parse($this->sale_date)->translatedFormat('d M Y') : null,
-            'reporter_name' => $this->reporter_name,
+            'employee_id' => $this->reporter_name,
         ];
+    }
+
+    public function employee()
+    {
+        return $this->belongsTo(EmployeeInformation::class, 'employee_id');
     }
 }

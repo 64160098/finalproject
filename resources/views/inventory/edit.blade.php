@@ -29,7 +29,7 @@
                                     <div class="p-4 bg-white dark:bg-gray-800 shadow sm:rounded-lg flex items-center gap-4">
                                         <div>
                                             <x-input-label for="code" :value="__('รหัส')" />
-                                            {{ $inventory->code }}
+                                            {{ $inventory->product_id  }}
                                             @error('code')
                                                 <div class="aleart alert-success">{{ $message }}</div>
                                             @enderror
@@ -38,7 +38,7 @@
                                     <div class="p-4 bg-white dark:bg-gray-800 shadow sm:rounded-lg flex items-center gap-4">
                                         <div>
                                             <x-input-label for="product_name" :value="__('ชื่อสินค้า')" />
-                                            {{ $inventory->product_name }}
+                                            {{ $inventory->product->product_name }}
                                             @error('product_name')
                                                 <div class="aleart alert-success">{{ $message }}</div>
                                             @enderror

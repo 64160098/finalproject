@@ -15,7 +15,10 @@ class UserController extends Controller
     
         if ($searchTerm) {
             // ใช้ Scout ในการค้นหา
-            $users = User::search($searchTerm)->paginate(5);
+            $users = User::where('name', 'like', "%{$searchTerm}%")
+                ->orWhere('email', 'like', "%{$searchTerm}%")
+                ->orWhere('role', 'like', "%{$searchTerm}%")
+                ->paginate(5);
         } else {
             // ถ้าไม่มีคำค้นหา ให้ดึงข้อมูลทั้งหมดแบบปกติ
             $users = User::orderBy('id', 'asc')->paginate(5);
